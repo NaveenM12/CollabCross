@@ -111,32 +111,41 @@ const UserSection = styled.div`
 const UserAvatar = styled.div`
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 15px;
+  gap: 15px;
+  margin-bottom: 20px;
   padding-bottom: 15px;
   border-bottom: 1px solid ${darkTheme.border.primary};
 `;
 
 const AvatarIcon = styled.div`
-  width: 32px;
-  height: 32px;
-  border-radius: 16px;
-  background-color: ${darkTheme.background.tertiary};
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  background-color: ${darkTheme.brand.primary};
   display: flex;
   align-items: center;
   justify-content: center;
+  color: white;
+  font-size: 22px;
 `;
 
 const Username = styled.div`
   font-weight: bold;
-  font-size: 18px;
+  font-size: 22px;
+  color: ${darkTheme.text.primary};
 `;
 
 const StatsItem = styled.div`
   display: flex;
   justify-content: space-between;
-  margin-bottom: 8px;
-  font-size: 16px;
+  font-size: 18px;
+  color: ${darkTheme.text.secondary};
+  
+  span:last-child {
+    font-weight: bold;
+    font-size: 22px;
+    color: ${darkTheme.brand.primary};
+  }
 `;
 
 const AddWordSection = styled.div`
@@ -465,6 +474,56 @@ const NewPuzzleButton = styled.button`
   }
 `;
 
+// Add new styled components for the AI clues section
+const AICluesSection = styled.div`
+  margin-bottom: 30px;
+  border-top: 1px solid ${darkTheme.border.primary};
+  padding-top: 20px;
+`;
+
+const AICluesTitle = styled.h2`
+  font-size: 24px;
+  margin: 0 0 15px 0;
+  font-weight: normal;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  
+  span {
+    color: ${darkTheme.brand.primary};
+  }
+`;
+
+const ThemeInput = styled(StyledInput)`
+  min-width: 300px;
+`;
+
+const ThemeButton = styled(AddButton)`
+  background-color: ${darkTheme.brand.secondary};
+  min-width: 120px;
+  
+  &:hover {
+    background-color: ${darkTheme.brand.primary};
+  }
+`;
+
+const AIMessage = styled.div`
+  margin-top: 15px;
+  padding: 12px;
+  border-radius: 6px;
+  background-color: ${darkTheme.background.elevated};
+  color: ${darkTheme.text.primary};
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  
+  span {
+    color: ${darkTheme.brand.primary};
+    font-size: 18px;
+  }
+`;
+
 const CrosswordCreator = ({ onBackToHome }) => {
   const [gridSize, setGridSize] = useState(21);
   const [grid, setGrid] = useState([]);
@@ -481,6 +540,8 @@ const CrosswordCreator = ({ onBackToHome }) => {
   const [isResizing, setIsResizing] = useState(false);
   // Track all placed words with their original positions
   const [placedWords, setPlacedWords] = useState([]);
+  const [themeInput, setThemeInput] = useState('');
+  const [aiMessage, setAiMessage] = useState('');
   
   // Add state for saved puzzles
   const [savedPuzzles, setSavedPuzzles] = useState([
@@ -488,45 +549,27 @@ const CrosswordCreator = ({ onBackToHome }) => {
       id: 1,
       title: "Daily Crossword",
       words: [
-        { word: "PYTHON", clue: "Popular programming language", row: 1, col: 1, direction: "across", number: 1 },
-        { word: "HTML", clue: "Markup language for web pages", row: 1, col: 1, direction: "down", number: 1 },
-        { word: "CSS", clue: "Stylesheet language", row: 2, col: 3, direction: "down", number: 2 },
-        { word: "NODE", clue: "JavaScript runtime environment", row: 3, col: 1, direction: "across", number: 3 },
-        { word: "JAVA", clue: "Language known for 'write once, run anywhere'", row: 3, col: 4, direction: "down", number: 4 },
-        { word: "GIT", clue: "Version control system", row: 3, col: 2, direction: "down", number: 8 },
-        { word: "SQL", clue: "Language for database queries", row: 5, col: 2, direction: "across", number: 5 },
-        { word: "PHP", clue: "Server-side scripting language", row: 6, col: 2, direction: "across", number: 6 },
-        { word: "API", clue: "Interface for applications to communicate", row: 5, col: 4, direction: "down", number: 7 }
+        { word: "CODE", clue: "Instructions for computers", row: 1, col: 1, direction: "across", number: 1 },
+        { word: "CHIP", clue: "Small piece of silicon", row: 1, col: 1, direction: "down", number: 1 },
+        { word: "DATA", clue: "Information for processing", row: 3, col: 1, direction: "across", number: 2 }
       ]
     },
     {
       id: 2,
       title: "Tech Puzzle",
       words: [
-        { word: "ALGORITHM", clue: "Step-by-step procedure for calculations", row: 1, col: 1, direction: "across", number: 1 },
-        { word: "ARRAY", clue: "Ordered collection of items", row: 1, col: 1, direction: "down", number: 1 },
-        { word: "LOOP", clue: "Control flow statement for repeated execution", row: 3, col: 1, direction: "across", number: 2 },
-        { word: "STACK", clue: "LIFO data structure", row: 1, col: 8, direction: "down", number: 3 },
-        { word: "QUEUE", clue: "FIFO data structure", row: 5, col: 1, direction: "across", number: 4 },
-        { word: "BINARY", clue: "Base-2 number system", row: 3, col: 5, direction: "down", number: 5 },
-        { word: "RECURSION", clue: "Function that calls itself", row: 7, col: 1, direction: "across", number: 6 },
-        { word: "COMPILER", clue: "Transforms source code to machine code", row: 9, col: 2, direction: "across", number: 7 },
-        { word: "DATABASE", clue: "Organized collection of structured data", row: 1, col: 6, direction: "down", number: 8 }
+        { word: "LINK", clue: "Web connection", row: 1, col: 1, direction: "across", number: 1 },
+        { word: "LIST", clue: "Data structure", row: 1, col: 1, direction: "down", number: 1 },
+        { word: "NET", clue: "Short for internet", row: 3, col: 1, direction: "across", number: 2 }
       ]
     },
     {
       id: 3,
       title: "Fun with Words",
       words: [
-        { word: "PUZZLE", clue: "A game that tests ingenuity", row: 1, col: 1, direction: "across", number: 1 },
-        { word: "PLAY", clue: "To engage in activity for enjoyment", row: 1, col: 1, direction: "down", number: 1 },
-        { word: "WORD", clue: "Unit of language", row: 1, col: 4, direction: "down", number: 2 },
-        { word: "ZOOM", clue: "To move quickly", row: 3, col: 3, direction: "across", number: 3 },
-        { word: "JUMBLE", clue: "Mix in a confused way", row: 5, col: 1, direction: "across", number: 4 },
-        { word: "RIDDLE", clue: "A puzzling question as a game", row: 3, col: 6, direction: "down", number: 5 },
-        { word: "CROSSWORD", clue: "Word puzzle on grid", row: 7, col: 1, direction: "across", number: 6 },
-        { word: "ANAGRAM", clue: "Word formed by rearranging letters", row: 4, col: 1, direction: "down", number: 7 },
-        { word: "RHYME", clue: "Words with corresponding sounds", row: 3, col: 3, direction: "down", number: 8 }
+        { word: "PLAY", clue: "To engage in activity for enjoyment", row: 1, col: 1, direction: "across", number: 1 },
+        { word: "POST", clue: "To publish online", row: 1, col: 1, direction: "down", number: 1 },
+        { word: "GAME", clue: "Activity with rules and competition", row: 3, col: 1, direction: "across", number: 2 }
       ]
     }
   ]);
@@ -1263,6 +1306,99 @@ const CrosswordCreator = ({ onBackToHome }) => {
     onBackToHome('play', currentPuzzleId);
   };
   
+  // Add a new function to handle the theme submission
+  const handleThemeSubmit = () => {
+    if (!themeInput.trim()) {
+      // Use sports as the default theme
+      setThemeInput("sports");
+    }
+    
+    const theme = themeInput.trim() || "sports";
+    setAiMessage(`Generating clues based on the theme: "${theme}"...`);
+    
+    // Simulate loading time
+    setTimeout(() => {
+      // Sample clues based on a sports theme (shorter words that are more likely to connect)
+      const sampleClues = [
+        { word: "BALL", clue: "Round object used in many sports", direction: "across" },
+        { word: "TEAM", clue: "Group of players", direction: "across" },
+        { word: "GOAL", clue: "Target to score in", direction: "across" },
+        { word: "BATS", clue: "Used in baseball", direction: "down" },
+        { word: "GOLF", clue: "Sport with clubs", direction: "across" },
+        { word: "GAME", clue: "Competitive match", direction: "down" },
+        { word: "RACE", clue: "Contest of speed", direction: "across" },
+        { word: "SWIM", clue: "Move through water", direction: "down" }
+      ];
+      
+      // Only select 2 clues to keep it simple
+      const numClues = 2;
+      const selectedClues = [...sampleClues].sort(() => 0.5 - Math.random()).slice(0, numClues);
+      
+      // Add each clue
+      const newWords = [];
+      let currentPlacedWords = [...placedWords];
+      
+      for (const clueData of selectedClues) {
+        // Create a properly formatted word object for placement
+        const wordToPlace = clueData.word.toUpperCase();
+        const clueText = clueData.clue;
+        
+        // If it's the first word in an empty puzzle, place it at position 0,0
+        if (currentPlacedWords.length === 0) {
+          const newWordObj = {
+            word: wordToPlace,
+            clue: clueText,
+            row: 1,
+            col: 1,
+            direction: clueData.direction,
+            number: nextClueNumber
+          };
+          
+          newWords.push(newWordObj);
+          currentPlacedWords = [newWordObj];
+          setNextClueNumber(prev => prev + 1);
+        } else {
+          // Try to find placement for the word
+          const result = findOptimalArrangement(currentPlacedWords, wordToPlace);
+          
+          if (result) {
+            const { updatedWords, newWordPlacement } = result;
+            
+            // Create the new word object
+            const newWordObj = {
+              word: wordToPlace,
+              clue: clueText,
+              row: newWordPlacement.row,
+              col: newWordPlacement.col,
+              direction: newWordPlacement.direction,
+              number: nextClueNumber
+            };
+            
+            // Add to our tracking arrays
+            newWords.push(newWordObj);
+            currentPlacedWords = [...updatedWords, newWordObj];
+            setNextClueNumber(prev => prev + 1);
+          }
+        }
+      }
+      
+      // Update the placedWords state with all new words
+      if (newWords.length > 0) {
+        const finalPlacedWords = [...placedWords, ...newWords];
+        setPlacedWords(finalPlacedWords);
+        
+        // Update the grid and clues with all words
+        updateGridAndClues(finalPlacedWords);
+        
+        setAiMessage(`Added ${newWords.length} clues related to "${theme}"!`);
+      } else {
+        setAiMessage(`Couldn't place any words from the "${theme}" theme. Try adding words manually.`);
+      }
+      
+      setThemeInput('');
+    }, 1500);
+  };
+  
   return (
     <CreatorContainer>
       <Header>
@@ -1288,17 +1424,7 @@ const CrosswordCreator = ({ onBackToHome }) => {
             
             <StatsItem>
               <span>Created Puzzles:</span>
-              <span>12</span>
-            </StatsItem>
-            
-            <StatsItem>
-              <span>Shared Puzzles:</span>
-              <span>8</span>
-            </StatsItem>
-            
-            <StatsItem>
-              <span>Completed:</span>
-              <span>24</span>
+              <span>{savedPuzzles.length}</span>
             </StatsItem>
           </UserSection>
           
@@ -1362,6 +1488,34 @@ const CrosswordCreator = ({ onBackToHome }) => {
               </AddButton>
             </InputsRow>
           </AddWordSection>
+          
+          <AICluesSection>
+            <AICluesTitle>
+              <span>✨</span>
+              Add clues using AI
+            </AICluesTitle>
+            
+            <InputsRow>
+              <ThemeInput 
+                type="text" 
+                placeholder="Enter a theme (e.g. sports, movies, science)" 
+                value={themeInput}
+                onChange={(e) => setThemeInput(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleThemeSubmit()}
+              />
+              <ThemeButton 
+                onClick={handleThemeSubmit}
+              >
+                Generate
+              </ThemeButton>
+            </InputsRow>
+            
+            {aiMessage && (
+              <AIMessage>
+                <span>🤖</span> {aiMessage}
+              </AIMessage>
+            )}
+          </AICluesSection>
           
           <GridContainer>
             <Grid size={gridSize}>

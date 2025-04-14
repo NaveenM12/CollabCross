@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import GameHeader from './GameHeader';
 import CrosswordGrid from './CrosswordGrid';
 import CluesList from './CluesList';
 import PlayerStats from './PlayerStats';
 import ChatBox from './ChatBox';
+import { darkTheme } from '../styles/theme';
 
 const GameContainer = styled.div`
   display: flex;
@@ -28,8 +29,8 @@ const GameContent = styled.div`
 `;
 
 const LeftPanel = styled.div`
-  width: 250px;
-  padding: 10px;
+  width: 320px;
+  padding: 20px;
   background-color: #1f1f1f;
   
   @media (max-width: 768px) {
@@ -54,6 +55,25 @@ const RightPanel = styled.div`
   @media (max-width: 768px) {
     width: 100%;
   }
+`;
+
+// Add a new styled component for the progress bar
+const ProgressBarContainer = styled.div`
+  width: 100%;
+  height: 12px;
+  background-color: ${darkTheme.background.elevated};
+  border-radius: 6px;
+  margin: 15px 0;
+  overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+`;
+
+const ProgressBarFill = styled.div`
+  height: 100%;
+  background-color: #4caf50;
+  width: ${props => props.progress}%;
+  transition: width 0.3s ease;
+  background-image: linear-gradient(to right, #4caf50, #8bc34a);
 `;
 
 // Mock data for crossword puzzle
@@ -133,11 +153,46 @@ const CrosswordGame = ({ mode, onModeChange, onBackToHome, puzzleId }) => {
   ]);
   const [puzzleStats, setPuzzleStats] = useState({
     avgTime: '21:55',
-    yourTime: '11:47',
+    yourTime: '00:00',
     rating: '1100'
   });
   const [puzzleTitle, setPuzzleTitle] = useState("Daily Crossword");
   const [clues, setClues] = useState(crosswordData.clues);
+  
+  // Add states for timer and progress
+  const [secondsElapsed, setSecondsElapsed] = useState(0);
+  const [progress, setProgress] = useState(0);
+  const [totalCells, setTotalCells] = useState(0);
+  const [filledCells, setFilledCells] = useState(0);
+  
+  // Create a timer using useRef and useEffect
+  const timerRef = useRef(null);
+  
+  // Initialize timer when component mounts
+  useEffect(() => {
+    timerRef.current = setInterval(() => {
+      setSecondsElapsed(prev => prev + 1);
+    }, 1000);
+    
+    // Clean up timer when component unmounts
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, []);
+  
+  // Update the time display whenever secondsElapsed changes
+  useEffect(() => {
+    const minutes = Math.floor(secondsElapsed / 60);
+    const seconds = secondsElapsed % 60;
+    const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    
+    setPuzzleStats(prev => ({
+      ...prev,
+      yourTime: formattedTime
+    }));
+  }, [secondsElapsed]);
 
   useEffect(() => {
     // If a puzzleId is provided, load that created puzzle
@@ -145,6 +200,37 @@ const CrosswordGame = ({ mode, onModeChange, onBackToHome, puzzleId }) => {
       loadCreatedPuzzle(puzzleId);
     }
   }, [puzzleId]);
+
+  // Calculate progress whenever filledCells or totalCells changes
+  useEffect(() => {
+    if (totalCells > 0) {
+      const newProgress = Math.floor((filledCells / totalCells) * 100);
+      setProgress(newProgress);
+    }
+  }, [filledCells, totalCells]);
+
+  // Initialize totalCells and filledCells for the default puzzle
+  useEffect(() => {
+    if (!puzzleId) {
+      // Count non-black cells and filled cells in the default puzzle
+      let nonBlackCells = 0;
+      let filled = 0;
+      
+      for (let r = 0; r < grid.length; r++) {
+        for (let c = 0; c < grid[r].length; c++) {
+          if (!grid[r][c].isBlack) {
+            nonBlackCells++;
+            if (grid[r][c].value) {
+              filled++;
+            }
+          }
+        }
+      }
+      
+      setTotalCells(nonBlackCells);
+      setFilledCells(filled);
+    }
+  }, []);
 
   const loadCreatedPuzzle = (id) => {
     // In a real app, you would fetch the puzzle from a database
@@ -264,6 +350,19 @@ const CrosswordGame = ({ mode, onModeChange, onBackToHome, puzzleId }) => {
       
       setGrid(newGrid);
       
+      // Calculate total number of non-black cells for progress tracking
+      let nonBlackCells = 0;
+      for (let r = 0; r < newGrid.length; r++) {
+        for (let c = 0; c < newGrid[r].length; c++) {
+          if (!newGrid[r][c].isBlack) {
+            nonBlackCells++;
+          }
+        }
+      }
+      setTotalCells(nonBlackCells);
+      setFilledCells(0);
+      setProgress(0);
+      
       // For custom puzzles, only show the user as player
       setPlayers([
         { id: 'player1', name: 'You', squaresFilled: 0, wordsSolved: 0, score: 0 }
@@ -273,6 +372,9 @@ const CrosswordGame = ({ mode, onModeChange, onBackToHome, puzzleId }) => {
       setChatMessages([
         { sender: 'system', text: `Playing your created puzzle: "${puzzle.title}"` }
       ]);
+      
+      // Reset timer
+      setSecondsElapsed(0);
     }
   };
 
@@ -287,8 +389,15 @@ const CrosswordGame = ({ mode, onModeChange, onBackToHome, puzzleId }) => {
       // Toggle between showing the value and emptying it (allows user to undo)
       if (newGrid[row][col].value === newGrid[row][col].correctValue) {
         newGrid[row][col].value = '';
+        setFilledCells(prev => prev - 1); // Decrease filled cells count
+        
+        // Also update player stats when removing a letter
+        const newPlayers = [...players];
+        newPlayers[0].squaresFilled = Math.max(0, newPlayers[0].squaresFilled - 1);
+        setPlayers(newPlayers);
       } else {
         newGrid[row][col].value = newGrid[row][col].correctValue;
+        setFilledCells(prev => prev + 1); // Increase filled cells count
         
         // Update player stats when filling in a square correctly
         const newPlayers = [...players];
@@ -306,6 +415,12 @@ const CrosswordGame = ({ mode, onModeChange, onBackToHome, puzzleId }) => {
     } else {
       // Fallback if correctValue is not set
       newGrid[row][col].value = 'A';
+      setFilledCells(prev => prev + 1); // Increase filled cells count
+      
+      // Update player stats when filling in a square
+      const newPlayers = [...players];
+      newPlayers[0].squaresFilled += 1;
+      setPlayers(newPlayers);
     }
     
     setGrid(newGrid);
@@ -387,10 +502,17 @@ const CrosswordGame = ({ mode, onModeChange, onBackToHome, puzzleId }) => {
         onBackToHome={handleBackToHome}
       />
       
+      <ProgressBarContainer>
+        <ProgressBarFill progress={progress} />
+      </ProgressBarContainer>
+      
       <GameContent>
         <LeftPanel>
           <PlayerStats 
-            players={players}
+            players={players.map(player => ({
+              ...player,
+              estimatedTotalSquares: totalCells
+            }))}
             currentPlayer={currentPlayer}
           />
           

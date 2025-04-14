@@ -60,6 +60,24 @@ const StatValue = styled.div`
   text-align: center;
 `;
 
+const TimerValue = styled(StatValue)`
+  background-color: ${darkTheme.brand.secondary};
+  color: white;
+  animation: pulse 2s infinite;
+  
+  @keyframes pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(51, 102, 204, 0.4);
+    }
+    70% {
+      box-shadow: 0 0 0 8px rgba(51, 102, 204, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(51, 102, 204, 0);
+    }
+  }
+`;
+
 const PuzzleRating = styled(StatValue)`
   background-color: ${props => props.rating >= 1000 ? '#5cb85c' : '#f0ad4e'};
   color: white;
@@ -118,7 +136,7 @@ const GameHeader = ({ puzzleStats, puzzleTitle = "Daily Crossword", onBackToHome
         
         <StatItem>
           <StatLabel>Your Time</StatLabel>
-          <StatValue>{puzzleStats.yourTime}</StatValue>
+          <TimerValue>{puzzleStats.yourTime}</TimerValue>
         </StatItem>
         
         <StatItem>
