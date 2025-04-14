@@ -55,15 +55,15 @@ const CellNumber = styled.div`
   color: ${darkTheme.text.tertiary};
 `;
 
-// Mock numbers for the grid cells
-const cellNumbers = {
-  '0-0': 1, '0-5': 5, '0-9': 8,
-  '1-0': 13, '1-5': 14, '1-9': 16,
-  '2-0': 17, '2-5': 18, '3-0': 19,
-  '4-5': 20, '5-5': 23, '6-5': 24,
-  '7-5': 25, '8-5': 28, '9-5': 29,
-  '10-5': 31
-};
+// Remove the mock numbers
+// const cellNumbers = {
+//   '0-0': 1, '0-5': 5, '0-9': 8,
+//   '1-0': 13, '1-5': 14, '1-9': 16,
+//   '2-0': 17, '2-5': 18, '3-0': 19,
+//   '4-5': 20, '5-5': 23, '6-5': 24,
+//   '7-5': 25, '8-5': 28, '9-5': 29,
+//   '10-5': 31
+// };
 
 const CrosswordGrid = ({ grid, onCellClick }) => {
   const [selectedCell, setSelectedCell] = useState(null);
@@ -143,8 +143,8 @@ const CrosswordGrid = ({ grid, onCellClick }) => {
               className={getClassName(rowIndex, colIndex)}
               onClick={() => handleCellClick(rowIndex, colIndex)}
             >
-              {cellNumbers[`${rowIndex}-${colIndex}`] && (
-                <CellNumber>{cellNumbers[`${rowIndex}-${colIndex}`]}</CellNumber>
+              {cell.number && (
+                <CellNumber>{cell.number}</CellNumber>
               )}
               {cell.value}
             </Cell>

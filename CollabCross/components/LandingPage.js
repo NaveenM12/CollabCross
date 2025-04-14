@@ -220,6 +220,13 @@ const FriendItem = styled.div`
   display: flex;
   align-items: center;
   gap: 15px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 6px;
+  
+  &:hover {
+    background-color: ${darkTheme.background.tertiary};
+  }
 `;
 
 const FriendName = styled.div`
@@ -236,11 +243,16 @@ const StatusDot = styled.div`
 
 const LandingPage = ({ onStartGame }) => {
   const [selectedMode, setSelectedMode] = useState(null);
+  const [selectedFriend, setSelectedFriend] = useState(null);
 
   const handleStartGame = () => {
     if (selectedMode) {
       onStartGame(selectedMode);
     }
+  };
+
+  const handleFriendSelect = (friendName) => {
+    setSelectedFriend(friendName);
   };
 
   return (
@@ -298,20 +310,26 @@ const LandingPage = ({ onStartGame }) => {
             </FriendsHeader>
             
             <FriendsList>
-              <FriendItem>
-                <RadioButton selected={false} />
+              <FriendItem onClick={() => handleFriendSelect('Milan_J12')}>
+                <RadioButton>
+                  {selectedFriend === 'Milan_J12' && <RadioButtonInner />}
+                </RadioButton>
                 <FriendName>Milan_J12</FriendName>
                 <StatusDot $online={true} />
               </FriendItem>
               
-              <FriendItem>
-                <RadioButton selected={true} />
+              <FriendItem onClick={() => handleFriendSelect('Jacob_S')}>
+                <RadioButton>
+                  {selectedFriend === 'Jacob_S' && <RadioButtonInner />}
+                </RadioButton>
                 <FriendName>Jacob_S</FriendName>
                 <StatusDot $online={false} />
               </FriendItem>
               
-              <FriendItem>
-                <RadioButton selected={false} />
+              <FriendItem onClick={() => handleFriendSelect('Dr_Dome_112')}>
+                <RadioButton>
+                  {selectedFriend === 'Dr_Dome_112' && <RadioButtonInner />}
+                </RadioButton>
                 <FriendName>Dr_Dome_112</FriendName>
                 <StatusDot $online={true} />
               </FriendItem>

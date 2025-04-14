@@ -215,6 +215,27 @@ const SaveButton = styled.button`
   }
 `;
 
+const PlayButton = styled.button`
+  background-color: ${darkTheme.brand.secondary};
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  margin-left: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  height: 42px;
+  
+  &:hover {
+    background-color: ${darkTheme.brand.primary};
+  }
+  
+  &:disabled {
+    background-color: ${darkTheme.background.tertiary};
+    cursor: not-allowed;
+  }
+`;
+
 const InputsRow = styled.div`
   display: flex;
   gap: 10px;
@@ -467,48 +488,45 @@ const CrosswordCreator = ({ onBackToHome }) => {
       id: 1,
       title: "Daily Crossword",
       words: [
-        { word: "PYTHON", clue: "Popular programming language", row: 0, col: 0, direction: "across", number: 1 },
-        { word: "REACT", clue: "JavaScript library for building UIs", row: 0, col: 3, direction: "down", number: 2 },
-        { word: "NODE", clue: "JavaScript runtime environment", row: 3, col: 0, direction: "across", number: 3 },
-        { word: "JAVA", clue: "Language known for 'write once, run anywhere'", row: 2, col: 3, direction: "across", number: 4 },
-        { word: "SQL", clue: "Language for database queries", row: 4, col: 1, direction: "across", number: 5 },
-        { word: "HTML", clue: "Markup language for web pages", row: 1, col: 0, direction: "down", number: 6 },
-        { word: "CSS", clue: "Stylesheet language", row: 5, col: 5, direction: "down", number: 7 },
-        { word: "PHP", clue: "Server-side scripting language", row: 6, col: 2, direction: "across", number: 8 },
-        { word: "GIT", clue: "Version control system", row: 5, col: 0, direction: "down", number: 9 },
-        { word: "API", clue: "Interface for applications to communicate", row: 7, col: 4, direction: "across", number: 10 }
+        { word: "PYTHON", clue: "Popular programming language", row: 1, col: 1, direction: "across", number: 1 },
+        { word: "HTML", clue: "Markup language for web pages", row: 1, col: 1, direction: "down", number: 1 },
+        { word: "CSS", clue: "Stylesheet language", row: 2, col: 3, direction: "down", number: 2 },
+        { word: "NODE", clue: "JavaScript runtime environment", row: 3, col: 1, direction: "across", number: 3 },
+        { word: "JAVA", clue: "Language known for 'write once, run anywhere'", row: 3, col: 4, direction: "down", number: 4 },
+        { word: "GIT", clue: "Version control system", row: 3, col: 2, direction: "down", number: 8 },
+        { word: "SQL", clue: "Language for database queries", row: 5, col: 2, direction: "across", number: 5 },
+        { word: "PHP", clue: "Server-side scripting language", row: 6, col: 2, direction: "across", number: 6 },
+        { word: "API", clue: "Interface for applications to communicate", row: 5, col: 4, direction: "down", number: 7 }
       ]
     },
     {
       id: 2,
       title: "Tech Puzzle",
       words: [
-        { word: "ALGORITHM", clue: "Step-by-step procedure for calculations", row: 0, col: 0, direction: "across", number: 1 },
-        { word: "ARRAY", clue: "Ordered collection of items", row: 0, col: 0, direction: "down", number: 1 },
-        { word: "LOOP", clue: "Control flow statement for repeated execution", row: 2, col: 2, direction: "across", number: 2 },
-        { word: "STACK", clue: "LIFO data structure", row: 1, col: 7, direction: "down", number: 3 },
-        { word: "QUEUE", clue: "FIFO data structure", row: 3, col: 0, direction: "across", number: 4 },
-        { word: "BINARY", clue: "Base-2 number system", row: 4, col: 4, direction: "down", number: 5 },
-        { word: "RECURSION", clue: "Function that calls itself", row: 5, col: 0, direction: "across", number: 6 },
-        { word: "COMPILER", clue: "Transforms source code to machine code", row: 6, col: 2, direction: "across", number: 7 },
-        { word: "DATABASE", clue: "Organized collection of structured data", row: 3, col: 5, direction: "down", number: 8 },
-        { word: "CLOUD", clue: "On-demand computing resources", row: 8, col: 0, direction: "across", number: 9 }
+        { word: "ALGORITHM", clue: "Step-by-step procedure for calculations", row: 1, col: 1, direction: "across", number: 1 },
+        { word: "ARRAY", clue: "Ordered collection of items", row: 1, col: 1, direction: "down", number: 1 },
+        { word: "LOOP", clue: "Control flow statement for repeated execution", row: 3, col: 1, direction: "across", number: 2 },
+        { word: "STACK", clue: "LIFO data structure", row: 1, col: 8, direction: "down", number: 3 },
+        { word: "QUEUE", clue: "FIFO data structure", row: 5, col: 1, direction: "across", number: 4 },
+        { word: "BINARY", clue: "Base-2 number system", row: 3, col: 5, direction: "down", number: 5 },
+        { word: "RECURSION", clue: "Function that calls itself", row: 7, col: 1, direction: "across", number: 6 },
+        { word: "COMPILER", clue: "Transforms source code to machine code", row: 9, col: 2, direction: "across", number: 7 },
+        { word: "DATABASE", clue: "Organized collection of structured data", row: 1, col: 6, direction: "down", number: 8 }
       ]
     },
     {
       id: 3,
       title: "Fun with Words",
       words: [
-        { word: "PUZZLE", clue: "A game that tests ingenuity", row: 0, col: 0, direction: "across", number: 1 },
-        { word: "PLAY", clue: "To engage in activity for enjoyment", row: 0, col: 0, direction: "down", number: 1 },
-        { word: "ZOOM", clue: "To move quickly", row: 2, col: 2, direction: "across", number: 2 },
-        { word: "WORD", clue: "Unit of language", row: 1, col: 3, direction: "down", number: 3 },
-        { word: "JUMBLE", clue: "Mix in a confused way", row: 3, col: 0, direction: "across", number: 4 },
-        { word: "RIDDLE", clue: "A puzzling question as a game", row: 4, col: 1, direction: "down", number: 5 },
-        { word: "CROSSWORD", clue: "Word puzzle on grid", row: 5, col: 0, direction: "across", number: 6 },
-        { word: "ANAGRAM", clue: "Word formed by rearranging letters", row: 6, col: 3, direction: "across", number: 7 },
-        { word: "RHYME", clue: "Words with corresponding sounds", row: 5, col: 6, direction: "down", number: 8 },
-        { word: "SYNONYM", clue: "Word having the same meaning as another", row: 7, col: 1, direction: "across", number: 9 }
+        { word: "PUZZLE", clue: "A game that tests ingenuity", row: 1, col: 1, direction: "across", number: 1 },
+        { word: "PLAY", clue: "To engage in activity for enjoyment", row: 1, col: 1, direction: "down", number: 1 },
+        { word: "WORD", clue: "Unit of language", row: 1, col: 4, direction: "down", number: 2 },
+        { word: "ZOOM", clue: "To move quickly", row: 3, col: 3, direction: "across", number: 3 },
+        { word: "JUMBLE", clue: "Mix in a confused way", row: 5, col: 1, direction: "across", number: 4 },
+        { word: "RIDDLE", clue: "A puzzling question as a game", row: 3, col: 6, direction: "down", number: 5 },
+        { word: "CROSSWORD", clue: "Word puzzle on grid", row: 7, col: 1, direction: "across", number: 6 },
+        { word: "ANAGRAM", clue: "Word formed by rearranging letters", row: 4, col: 1, direction: "down", number: 7 },
+        { word: "RHYME", clue: "Words with corresponding sounds", row: 3, col: 3, direction: "down", number: 8 }
       ]
     }
   ]);
@@ -517,6 +535,9 @@ const CrosswordCreator = ({ onBackToHome }) => {
   // Initialize empty grid
   useEffect(() => {
     initializeGrid();
+    
+    // Initialize window.savedPuzzles for global access
+    window.savedPuzzles = savedPuzzles;
   }, []);
   
   // Add keyboard shortcut for Command+Return
@@ -1122,6 +1143,9 @@ const CrosswordCreator = ({ onBackToHome }) => {
       setActivePuzzleId(updatedPuzzles[existingPuzzleIndex].id);
       setErrorMessage(null);
       
+      // Save to window to make it accessible to other components
+      window.savedPuzzles = updatedPuzzles;
+      
       // Show feedback
       alert(`Puzzle "${title}" updated successfully!`);
     } else {
@@ -1132,9 +1156,13 @@ const CrosswordCreator = ({ onBackToHome }) => {
         words: placedWords
       };
       
-      setSavedPuzzles([...savedPuzzles, newPuzzle]);
+      const updatedPuzzles = [...savedPuzzles, newPuzzle];
+      setSavedPuzzles(updatedPuzzles);
       setActivePuzzleId(newPuzzle.id);
       setErrorMessage(null);
+      
+      // Save to window to make it accessible to other components
+      window.savedPuzzles = updatedPuzzles;
       
       // Show feedback
       alert(`Puzzle "${title}" saved successfully!`);
@@ -1180,6 +1208,59 @@ const CrosswordCreator = ({ onBackToHome }) => {
       across: [],
       down: []
     });
+  };
+  
+  const playPuzzle = () => {
+    // First save the puzzle if it's not already saved
+    if (!title.trim()) {
+      setErrorMessage("Please enter a title for your crossword before playing");
+      return;
+    }
+    
+    if (placedWords.length === 0) {
+      setErrorMessage("Please add some words to your crossword before playing");
+      return;
+    }
+    
+    // Save current puzzle if not already saved
+    const existingPuzzleIndex = savedPuzzles.findIndex(p => p.title.toLowerCase() === title.toLowerCase());
+    
+    let currentPuzzleId;
+    
+    if (existingPuzzleIndex >= 0) {
+      // Update existing puzzle
+      const updatedPuzzles = [...savedPuzzles];
+      updatedPuzzles[existingPuzzleIndex] = {
+        ...updatedPuzzles[existingPuzzleIndex],
+        title: title,
+        words: placedWords
+      };
+      
+      setSavedPuzzles(updatedPuzzles);
+      currentPuzzleId = updatedPuzzles[existingPuzzleIndex].id;
+      setActivePuzzleId(currentPuzzleId);
+      
+      // Save to window to make it accessible to other components
+      window.savedPuzzles = updatedPuzzles;
+    } else {
+      // Create new puzzle
+      const newPuzzle = {
+        id: Date.now(), // Use timestamp as a simple unique ID
+        title: title,
+        words: placedWords
+      };
+      
+      const updatedPuzzles = [...savedPuzzles, newPuzzle];
+      setSavedPuzzles(updatedPuzzles);
+      currentPuzzleId = newPuzzle.id;
+      setActivePuzzleId(currentPuzzleId);
+      
+      // Save to window to make it accessible to other components
+      window.savedPuzzles = updatedPuzzles;
+    }
+    
+    // Navigate to play the crossword
+    onBackToHome('play', currentPuzzleId);
   };
   
   return (
@@ -1251,6 +1332,12 @@ const CrosswordCreator = ({ onBackToHome }) => {
             <SaveButton onClick={savePuzzle}>
               Save
             </SaveButton>
+            <PlayButton 
+              onClick={playPuzzle}
+              disabled={placedWords.length === 0}
+            >
+              Play Crossword
+            </PlayButton>
           </TitleSection>
           
           <AddWordSection>

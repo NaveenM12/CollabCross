@@ -120,7 +120,7 @@ const fillPuzzle = () => {
   return filledGrid;
 };
 
-const CrosswordGame = ({ mode, onModeChange, onBackToHome }) => {
+const CrosswordGame = ({ mode, onModeChange, onBackToHome, puzzleId }) => {
   const [grid, setGrid] = useState(() => fillPuzzle());
   const [currentPlayer, setCurrentPlayer] = useState('You');
   const [players, setPlayers] = useState([
@@ -136,23 +136,245 @@ const CrosswordGame = ({ mode, onModeChange, onBackToHome }) => {
     yourTime: '11:47',
     rating: '1100'
   });
+  const [puzzleTitle, setPuzzleTitle] = useState("Daily Crossword");
+  const [clues, setClues] = useState(crosswordData.clues);
+
+  useEffect(() => {
+    // If a puzzleId is provided, load that created puzzle
+    if (puzzleId) {
+      loadCreatedPuzzle(puzzleId);
+    }
+  }, [puzzleId]);
+
+  const loadCreatedPuzzle = (id) => {
+    // In a real app, you would fetch the puzzle from a database
+    // Here, we'll mock it by finding it in localStorage or a mock storage
+    
+    // For demo purposes, let's assume we can access this from the window object
+    // In a real app, you'd want to use Context, Redux, or another state management solution
+    const savedPuzzles = window.savedPuzzles || [];
+    const puzzle = savedPuzzles.find(p => p.id === id);
+    
+    if (puzzle) {
+      setPuzzleTitle(puzzle.title);
+      
+      // Create a completely empty grid
+      const newGrid = Array(15).fill().map(() => 
+        Array(15).fill().map(() => ({ 
+          value: '', 
+          isBlack: true, // Start with all black cells
+          number: null,
+          correctValue: null
+        }))
+      );
+      
+      // Create clues arrays
+      const acrossClues = [];
+      const downClues = [];
+      
+      // Sort words for consistent numbering
+      const sortedWords = [...puzzle.words].sort((a, b) => {
+        if (a.row !== b.row) return a.row - b.row;
+        return a.col - b.col;
+      });
+      
+      // First pass: Clear paths for words and set numbers
+      sortedWords.forEach(wordData => {
+        const { word, clue, row, col, direction, number } = wordData;
+        
+        // Convert 1-based indices to 0-based for the grid
+        // Our grid is 0-indexed, but puzzle data uses 1-indexed positions
+        const gridRow = row - 1;
+        const gridCol = col - 1;
+        
+        // Add the clue to the appropriate array
+        if (direction === 'across') {
+          acrossClues.push({ number, clue, answer: word });
+          
+          // Clear cells for this word (make them not black)
+          for (let i = 0; i < word.length; i++) {
+            if (gridRow >= 0 && gridRow < newGrid.length && 
+                (gridCol + i) >= 0 && (gridCol + i) < newGrid[0].length) {
+              newGrid[gridRow][gridCol + i].isBlack = false;
+            }
+          }
+          
+          // Set the number on the first cell if it doesn't have one
+          if (gridRow >= 0 && gridRow < newGrid.length && 
+              gridCol >= 0 && gridCol < newGrid[0].length) {
+            if (!newGrid[gridRow][gridCol].number) {
+              newGrid[gridRow][gridCol].number = number;
+            }
+          }
+        } else { // direction === 'down'
+          downClues.push({ number, clue, answer: word });
+          
+          // Clear cells for this word (make them not black)
+          for (let i = 0; i < word.length; i++) {
+            if ((gridRow + i) >= 0 && (gridRow + i) < newGrid.length && 
+                gridCol >= 0 && gridCol < newGrid[0].length) {
+              newGrid[gridRow + i][gridCol].isBlack = false;
+            }
+          }
+          
+          // Set the number on the first cell if it doesn't have one
+          if (gridRow >= 0 && gridRow < newGrid.length && 
+              gridCol >= 0 && gridCol < newGrid[0].length) {
+            if (!newGrid[gridRow][gridCol].number) {
+              newGrid[gridRow][gridCol].number = number;
+            }
+          }
+        }
+      });
+      
+      // Second pass: Place the correct letters in the grid
+      sortedWords.forEach(wordData => {
+        const { word, row, col, direction } = wordData;
+        
+        // Convert 1-based indices to 0-based for the grid
+        const gridRow = row - 1;
+        const gridCol = col - 1;
+        
+        // Place letters in the grid
+        for (let i = 0; i < word.length; i++) {
+          const letter = word[i];
+          
+          if (direction === 'across') {
+            if (gridRow >= 0 && gridRow < newGrid.length && 
+                (gridCol + i) >= 0 && (gridCol + i) < newGrid[0].length) {
+              newGrid[gridRow][gridCol + i].correctValue = letter;
+            }
+          } else { // direction === 'down'
+            if ((gridRow + i) >= 0 && (gridRow + i) < newGrid.length && 
+                gridCol >= 0 && gridCol < newGrid[0].length) {
+              newGrid[gridRow + i][gridCol].correctValue = letter;
+            }
+          }
+        }
+      });
+      
+      // Sort clues by number
+      acrossClues.sort((a, b) => a.number - b.number);
+      downClues.sort((a, b) => a.number - b.number);
+      
+      setClues({
+        across: acrossClues,
+        down: downClues
+      });
+      
+      setGrid(newGrid);
+      
+      // For custom puzzles, only show the user as player
+      setPlayers([
+        { id: 'player1', name: 'You', squaresFilled: 0, wordsSolved: 0, score: 0 }
+      ]);
+      
+      // Clear chat for single player mode
+      setChatMessages([
+        { sender: 'system', text: `Playing your created puzzle: "${puzzle.title}"` }
+      ]);
+    }
+  };
 
   const handleCellClick = (row, col) => {
-    if (grid[row][col].isBlack) return;
+    if (!grid[row][col] || grid[row][col].isBlack) return;
     
-    // In a real app, you would update the cell value and sync with other users
-    const newGrid = [...grid];
-    newGrid[row][col].value = 'A'; // For demonstration, just fill with 'A'
+    // In a real app, you would update the cell value based on user input
+    // For demonstration, just fill with the correct value
+    const newGrid = JSON.parse(JSON.stringify(grid)); // Deep copy
+    
+    if (newGrid[row][col].correctValue) {
+      // Toggle between showing the value and emptying it (allows user to undo)
+      if (newGrid[row][col].value === newGrid[row][col].correctValue) {
+        newGrid[row][col].value = '';
+      } else {
+        newGrid[row][col].value = newGrid[row][col].correctValue;
+        
+        // Update player stats when filling in a square correctly
+        const newPlayers = [...players];
+        newPlayers[0].squaresFilled += 1;
+        
+        // Check if this completes a word
+        const completedWord = checkForCompletedWord(newGrid, row, col);
+        if (completedWord) {
+          newPlayers[0].wordsSolved += 1;
+          newPlayers[0].score += completedWord.length * 5; // 5 points per letter
+        }
+        
+        setPlayers(newPlayers);
+      }
+    } else {
+      // Fallback if correctValue is not set
+      newGrid[row][col].value = 'A';
+    }
+    
     setGrid(newGrid);
+  };
+  
+  const checkForCompletedWord = (grid, row, col) => {
+    // Check for completed across word
+    let acrossWord = '';
+    let acrossComplete = true;
+    
+    // Find start of across word
+    let startCol = col;
+    while (startCol > 0 && !grid[row][startCol-1].isBlack) {
+      startCol--;
+    }
+    
+    // Check if entire word is filled
+    for (let c = startCol; c < grid[0].length && !grid[row][c].isBlack; c++) {
+      if (!grid[row][c].value) {
+        acrossComplete = false;
+        break;
+      }
+      acrossWord += grid[row][c].value;
+    }
+    
+    // Check for completed down word
+    let downWord = '';
+    let downComplete = true;
+    
+    // Find start of down word
+    let startRow = row;
+    while (startRow > 0 && !grid[startRow-1][col].isBlack) {
+      startRow--;
+    }
+    
+    // Check if entire word is filled
+    for (let r = startRow; r < grid.length && !grid[r][col].isBlack; r++) {
+      if (!grid[r][col].value) {
+        downComplete = false;
+        break;
+      }
+      downWord += grid[r][col].value;
+    }
+    
+    // Return the completed word (or the longer one if both are completed)
+    if (acrossComplete && downComplete) {
+      return acrossWord.length >= downWord.length ? acrossWord : downWord;
+    } else if (acrossComplete) {
+      return acrossWord;
+    } else if (downComplete) {
+      return downWord;
+    }
+    
+    return null;
   };
 
   const addChatMessage = (message) => {
     setChatMessages([...chatMessages, { sender: 'You', text: message }]);
     
-    // Simulate response from other player
-    setTimeout(() => {
-      setChatMessages(prev => [...prev, { sender: 'Dr_Dome', text: 'I think 3-Down is "ASITIS"!' }]);
-    }, 1000);
+    // Simulate response from other player if in collaborative mode
+    if (mode === 'collaborative') {
+      setTimeout(() => {
+        setChatMessages(prev => [...prev, { sender: 'Dr_Dome', text: 'I think 3-Down is "ASITIS"!' }]);
+      }, 1000);
+    }
+  };
+
+  const handleBackToHome = () => {
+    onBackToHome(); // Use the original flow when going back from the game
   };
 
   return (
@@ -160,8 +382,9 @@ const CrosswordGame = ({ mode, onModeChange, onBackToHome }) => {
       <GameHeader 
         mode={mode} 
         puzzleStats={puzzleStats}
+        puzzleTitle={puzzleTitle}
         onModeChange={onModeChange}
-        onBackToHome={onBackToHome}
+        onBackToHome={handleBackToHome}
       />
       
       <GameContent>
@@ -188,7 +411,7 @@ const CrosswordGame = ({ mode, onModeChange, onBackToHome }) => {
         
         <RightPanel>
           <CluesList 
-            clues={crosswordData.clues}
+            clues={clues}
           />
         </RightPanel>
       </GameContent>

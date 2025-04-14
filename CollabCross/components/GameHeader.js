@@ -24,6 +24,13 @@ const Logo = styled.div`
   color: ${darkTheme.brand.primary};
 `;
 
+const PuzzleTitle = styled.div`
+  font-size: 20px;
+  font-weight: bold;
+  color: ${darkTheme.text.primary};
+  margin-left: 15px;
+`;
+
 const StatsContainer = styled.div`
   flex: 2;
   display: flex;
@@ -69,19 +76,17 @@ const ProfileIcon = styled.div`
   cursor: pointer;
 `;
 
-const HomeButton = styled.button`
+const BackButton = styled.button`
   background: none;
   border: none;
-  color: ${darkTheme.text.primary};
-  font-size: 24px;
+  color: ${darkTheme.text.secondary};
   cursor: pointer;
-  padding: 8px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  font-size: 14px;
   
   &:hover {
-    color: ${darkTheme.brand.primary};
+    color: ${darkTheme.text.primary};
   }
 `;
 
@@ -93,13 +98,16 @@ const RightSection = styled.div`
   gap: 15px;
 `;
 
-const GameHeader = ({ puzzleStats, onBackToHome }) => {
+const GameHeader = ({ puzzleStats, puzzleTitle = "Daily Crossword", onBackToHome }) => {
   return (
     <HeaderContainer>
       <LogoContainer>
         <Logo>
           Collab<span style={{ color: '#999' }}>+</span>Cross
         </Logo>
+        <PuzzleTitle>
+          {puzzleTitle}
+        </PuzzleTitle>
       </LogoContainer>
 
       <StatsContainer>
@@ -120,9 +128,9 @@ const GameHeader = ({ puzzleStats, onBackToHome }) => {
       </StatsContainer>
 
       <RightSection>
-        <HomeButton onClick={onBackToHome}>
-          🏠
-        </HomeButton>
+        <BackButton onClick={onBackToHome}>
+          ← Back to Home
+        </BackButton>
         <ProfileIcon>
           <span style={{ color: 'white' }}>👤</span>
         </ProfileIcon>

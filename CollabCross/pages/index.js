@@ -34,6 +34,7 @@ const GameWrapper = styled.div`
 export default function Home() {
   const [currentScreen, setCurrentScreen] = useState('landing');
   const [gameMode, setGameMode] = useState(null);
+  const [currentPuzzleId, setCurrentPuzzleId] = useState(null);
 
   const handleStartGame = (mode) => {
     if (mode === 'creator') {
@@ -44,9 +45,18 @@ export default function Home() {
     }
   };
 
-  const handleBackToHome = () => {
-    setCurrentScreen('landing');
-    setGameMode(null);
+  const handleBackToHome = (newScreen, puzzleId) => {
+    if (newScreen === 'play' && puzzleId) {
+      // Navigate to the game screen with the created puzzle
+      setCurrentPuzzleId(puzzleId);
+      setGameMode('solo');  // Playing own created puzzle is always solo mode
+      setCurrentScreen('game');
+    } else {
+      // Regular navigation back to landing page
+      setCurrentScreen('landing');
+      setGameMode(null);
+      setCurrentPuzzleId(null);
+    }
   };
 
   return (
@@ -69,6 +79,7 @@ export default function Home() {
             <CrosswordGame 
               mode={gameMode}
               onBackToHome={handleBackToHome}
+              puzzleId={currentPuzzleId}
             />
           </GameWrapper>
         )}
