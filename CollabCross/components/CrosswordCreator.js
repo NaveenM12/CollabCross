@@ -6,7 +6,7 @@ const CreatorContainer = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  padding: 20px;
+  padding: 25px;
   background-color: ${darkTheme.background.primary};
   color: ${darkTheme.text.primary};
 `;
@@ -15,15 +15,15 @@ const Header = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: 20px;
+  padding-bottom: 25px;
   border-bottom: 1px solid ${darkTheme.border.primary};
-  margin-bottom: 20px;
+  margin-bottom: 30px;
 `;
 
 const Logo = styled.div`
   display: flex;
   align-items: center;
-  font-size: 24px;
+  font-size: 32px;
   font-weight: bold;
 `;
 
@@ -70,13 +70,13 @@ const MainContent = styled.div`
 `;
 
 const LeftPanel = styled.div`
-  width: 200px;
-  margin-right: 20px;
+  width: 280px;
+  margin-right: 40px;
   
   @media (max-width: 768px) {
     width: 100%;
     margin-right: 0;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
   }
 `;
 
@@ -85,26 +85,27 @@ const CenterPanel = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  min-width: 500px;
 `;
 
 const RightPanel = styled.div`
-  width: 300px;
-  margin-left: 20px;
+  width: 380px;
+  margin-left: 40px;
   
   @media (max-width: 768px) {
     width: 100%;
     margin-left: 0;
-    margin-top: 20px;
+    margin-top: 30px;
   }
 `;
 
 const UserSection = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 15px;
+  padding: 20px;
   background-color: ${darkTheme.background.secondary};
   border-radius: 8px;
-  margin-bottom: 15px;
+  margin-bottom: 25px;
 `;
 
 const UserAvatar = styled.div`
@@ -128,13 +129,14 @@ const AvatarIcon = styled.div`
 
 const Username = styled.div`
   font-weight: bold;
+  font-size: 18px;
 `;
 
 const StatsItem = styled.div`
   display: flex;
   justify-content: space-between;
-  margin-bottom: 5px;
-  font-size: 14px;
+  margin-bottom: 8px;
+  font-size: 16px;
 `;
 
 const AddWordSection = styled.div`
@@ -145,12 +147,6 @@ const AddWordTitle = styled.h2`
   font-size: 24px;
   margin: 0 0 20px 0;
   font-weight: normal;
-`;
-
-const InputsRow = styled.div`
-  display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
 `;
 
 const StyledInput = styled.input`
@@ -172,6 +168,60 @@ const StyledInput = styled.input`
   }
 `;
 
+const TitleSection = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
+`;
+
+const TitleLabel = styled.h2`
+  font-size: 28px;
+  margin: 0 20px 0 0;
+  font-weight: normal;
+`;
+
+const TitleInput = styled.input`
+  flex: 1;
+  padding: 12px;
+  border-radius: 4px;
+  border: 1px solid ${darkTheme.border.primary};
+  background-color: ${darkTheme.background.elevated};
+  color: ${darkTheme.text.primary};
+  font-size: 18px;
+  
+  &:focus {
+    outline: none;
+    border-color: ${darkTheme.brand.primary};
+  }
+  
+  &::placeholder {
+    color: ${darkTheme.text.tertiary};
+  }
+`;
+
+const SaveButton = styled.button`
+  background-color: ${darkTheme.brand.primary};
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  margin-left: 15px;
+  font-size: 16px;
+  cursor: pointer;
+  height: 42px;
+  
+  &:hover {
+    background-color: ${darkTheme.brand.secondary};
+  }
+`;
+
+const InputsRow = styled.div`
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+  align-items: center;
+`;
+
 const AddButton = styled.button`
   background-color: ${darkTheme.brand.primary};
   color: white;
@@ -180,6 +230,7 @@ const AddButton = styled.button`
   padding: 10px 20px;
   font-size: 16px;
   cursor: pointer;
+  height: 42px; /* Match the height of the input fields */
   
   &:hover {
     background-color: ${darkTheme.brand.secondary};
@@ -229,23 +280,24 @@ const CellNumber = styled.div`
 `;
 
 const CluesSectionTitle = styled.h2`
-  font-size: 24px;
-  margin: 0 0 20px 0;
+  font-size: 28px;
+  margin: 0 0 25px 0;
   font-weight: normal;
 `;
 
 const TabsContainer = styled.div`
   display: flex;
-  margin-bottom: 15px;
-  border-bottom: 1px solid ${darkTheme.border.primary};
+  margin-bottom: 20px;
+  border-bottom: 2px solid ${darkTheme.border.primary};
 `;
 
 const Tab = styled.div`
-  padding: 10px 15px;
+  padding: 12px 20px;
   cursor: pointer;
-  border-bottom: 2px solid ${props => props.active ? darkTheme.brand.primary : 'transparent'};
+  border-bottom: 3px solid ${props => props.active ? darkTheme.brand.primary : 'transparent'};
   color: ${props => props.active ? darkTheme.text.primary : darkTheme.text.secondary};
   font-weight: ${props => props.active ? 'bold' : 'normal'};
+  font-size: 18px;
   
   &:hover {
     color: ${darkTheme.text.primary};
@@ -253,14 +305,17 @@ const Tab = styled.div`
 `;
 
 const CluesList = styled.div`
-  max-height: 400px;
+  max-height: 500px;
   overflow-y: auto;
+  padding: 10px;
+  border-radius: 8px;
+  background-color: ${darkTheme.background.secondary};
 `;
 
 const ClueItem = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 10px 0;
+  padding: 15px;
   border-bottom: 1px solid ${darkTheme.border.primary};
   
   &:last-child {
@@ -270,33 +325,38 @@ const ClueItem = styled.div`
 
 const ClueHeader = styled.div`
   display: flex;
-  gap: 5px;
-  margin-bottom: 5px;
+  gap: 8px;
+  margin-bottom: 8px;
 `;
 
 const ClueNumber = styled.span`
   font-weight: bold;
+  font-size: 18px;
 `;
 
 const ClueDirection = styled.span`
   color: ${darkTheme.text.secondary};
+  font-size: 18px;
 `;
 
 const ClueText = styled.div`
   color: ${darkTheme.text.secondary};
-  margin-bottom: 2px;
+  margin-bottom: 5px;
+  font-size: 16px;
 `;
 
 const ClueAnswer = styled.div`
   font-weight: bold;
   color: ${darkTheme.brand.primary};
+  font-size: 18px;
 `;
 
 const Message = styled.div`
-  padding: 15px;
+  padding: 20px;
   text-align: center;
   color: ${darkTheme.text.secondary};
-  margin-top: 10px;
+  margin-top: 15px;
+  font-size: 16px;
 `;
 
 const DirectionContainer = styled.div`
@@ -330,11 +390,66 @@ const DirectionRadio = styled.div`
   }
 `;
 
+const SavedPuzzlesSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  background-color: ${darkTheme.background.secondary};
+  border-radius: 8px;
+  margin-bottom: 25px;
+`;
+
+const SavedPuzzlesTitle = styled.div`
+  font-weight: bold;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid ${darkTheme.border.primary};
+  font-size: 18px;
+`;
+
+const PuzzleButton = styled.button`
+  background-color: ${props => props.active ? darkTheme.brand.primary : darkTheme.background.elevated};
+  color: ${props => props.active ? 'white' : darkTheme.text.primary};
+  border: 1px solid ${darkTheme.border.primary};
+  border-radius: 6px;
+  padding: 12px 15px;
+  margin-bottom: 10px;
+  font-size: 16px;
+  text-align: left;
+  cursor: pointer;
+  
+  &:hover {
+    background-color: ${props => props.active ? darkTheme.brand.primary : darkTheme.background.tertiary};
+  }
+`;
+
+const NewPuzzleButton = styled.button`
+  background-color: ${darkTheme.background.elevated};
+  color: ${darkTheme.text.primary};
+  border: 2px dashed ${darkTheme.border.primary};
+  border-radius: 6px;
+  padding: 12px 15px;
+  margin-top: 8px;
+  font-size: 18px;
+  text-align: center;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  
+  &:hover {
+    background-color: ${darkTheme.background.tertiary};
+    color: ${darkTheme.brand.primary};
+  }
+`;
+
 const CrosswordCreator = ({ onBackToHome }) => {
   const [gridSize, setGridSize] = useState(21);
   const [grid, setGrid] = useState([]);
   const [word, setWord] = useState('');
   const [clue, setClue] = useState('');
+  const [title, setTitle] = useState('');
   const [clues, setClues] = useState({
     across: [],
     down: []
@@ -345,6 +460,59 @@ const CrosswordCreator = ({ onBackToHome }) => {
   const [isResizing, setIsResizing] = useState(false);
   // Track all placed words with their original positions
   const [placedWords, setPlacedWords] = useState([]);
+  
+  // Add state for saved puzzles
+  const [savedPuzzles, setSavedPuzzles] = useState([
+    {
+      id: 1,
+      title: "Daily Crossword",
+      words: [
+        { word: "PYTHON", clue: "Popular programming language", row: 0, col: 0, direction: "across", number: 1 },
+        { word: "REACT", clue: "JavaScript library for building UIs", row: 0, col: 3, direction: "down", number: 2 },
+        { word: "NODE", clue: "JavaScript runtime environment", row: 3, col: 0, direction: "across", number: 3 },
+        { word: "JAVA", clue: "Language known for 'write once, run anywhere'", row: 2, col: 3, direction: "across", number: 4 },
+        { word: "SQL", clue: "Language for database queries", row: 4, col: 1, direction: "across", number: 5 },
+        { word: "HTML", clue: "Markup language for web pages", row: 1, col: 0, direction: "down", number: 6 },
+        { word: "CSS", clue: "Stylesheet language", row: 5, col: 5, direction: "down", number: 7 },
+        { word: "PHP", clue: "Server-side scripting language", row: 6, col: 2, direction: "across", number: 8 },
+        { word: "GIT", clue: "Version control system", row: 5, col: 0, direction: "down", number: 9 },
+        { word: "API", clue: "Interface for applications to communicate", row: 7, col: 4, direction: "across", number: 10 }
+      ]
+    },
+    {
+      id: 2,
+      title: "Tech Puzzle",
+      words: [
+        { word: "ALGORITHM", clue: "Step-by-step procedure for calculations", row: 0, col: 0, direction: "across", number: 1 },
+        { word: "ARRAY", clue: "Ordered collection of items", row: 0, col: 0, direction: "down", number: 1 },
+        { word: "LOOP", clue: "Control flow statement for repeated execution", row: 2, col: 2, direction: "across", number: 2 },
+        { word: "STACK", clue: "LIFO data structure", row: 1, col: 7, direction: "down", number: 3 },
+        { word: "QUEUE", clue: "FIFO data structure", row: 3, col: 0, direction: "across", number: 4 },
+        { word: "BINARY", clue: "Base-2 number system", row: 4, col: 4, direction: "down", number: 5 },
+        { word: "RECURSION", clue: "Function that calls itself", row: 5, col: 0, direction: "across", number: 6 },
+        { word: "COMPILER", clue: "Transforms source code to machine code", row: 6, col: 2, direction: "across", number: 7 },
+        { word: "DATABASE", clue: "Organized collection of structured data", row: 3, col: 5, direction: "down", number: 8 },
+        { word: "CLOUD", clue: "On-demand computing resources", row: 8, col: 0, direction: "across", number: 9 }
+      ]
+    },
+    {
+      id: 3,
+      title: "Fun with Words",
+      words: [
+        { word: "PUZZLE", clue: "A game that tests ingenuity", row: 0, col: 0, direction: "across", number: 1 },
+        { word: "PLAY", clue: "To engage in activity for enjoyment", row: 0, col: 0, direction: "down", number: 1 },
+        { word: "ZOOM", clue: "To move quickly", row: 2, col: 2, direction: "across", number: 2 },
+        { word: "WORD", clue: "Unit of language", row: 1, col: 3, direction: "down", number: 3 },
+        { word: "JUMBLE", clue: "Mix in a confused way", row: 3, col: 0, direction: "across", number: 4 },
+        { word: "RIDDLE", clue: "A puzzling question as a game", row: 4, col: 1, direction: "down", number: 5 },
+        { word: "CROSSWORD", clue: "Word puzzle on grid", row: 5, col: 0, direction: "across", number: 6 },
+        { word: "ANAGRAM", clue: "Word formed by rearranging letters", row: 6, col: 3, direction: "across", number: 7 },
+        { word: "RHYME", clue: "Words with corresponding sounds", row: 5, col: 6, direction: "down", number: 8 },
+        { word: "SYNONYM", clue: "Word having the same meaning as another", row: 7, col: 1, direction: "across", number: 9 }
+      ]
+    }
+  ]);
+  const [activePuzzleId, setActivePuzzleId] = useState(null);
   
   // Initialize empty grid
   useEffect(() => {
@@ -932,6 +1100,88 @@ const CrosswordCreator = ({ onBackToHome }) => {
     }
   };
   
+  const savePuzzle = () => {
+    if (!title.trim()) {
+      setErrorMessage("Please enter a title for your crossword");
+      return;
+    }
+    
+    // Check if a puzzle with this title already exists
+    const existingPuzzleIndex = savedPuzzles.findIndex(p => p.title.toLowerCase() === title.toLowerCase());
+    
+    if (existingPuzzleIndex >= 0) {
+      // Update existing puzzle
+      const updatedPuzzles = [...savedPuzzles];
+      updatedPuzzles[existingPuzzleIndex] = {
+        ...updatedPuzzles[existingPuzzleIndex],
+        title: title,
+        words: placedWords
+      };
+      
+      setSavedPuzzles(updatedPuzzles);
+      setActivePuzzleId(updatedPuzzles[existingPuzzleIndex].id);
+      setErrorMessage(null);
+      
+      // Show feedback
+      alert(`Puzzle "${title}" updated successfully!`);
+    } else {
+      // Create new puzzle
+      const newPuzzle = {
+        id: Date.now(), // Use timestamp as a simple unique ID
+        title: title,
+        words: placedWords
+      };
+      
+      setSavedPuzzles([...savedPuzzles, newPuzzle]);
+      setActivePuzzleId(newPuzzle.id);
+      setErrorMessage(null);
+      
+      // Show feedback
+      alert(`Puzzle "${title}" saved successfully!`);
+    }
+  };
+  
+  const loadPuzzle = (puzzleId) => {
+    const puzzle = savedPuzzles.find(p => p.id === puzzleId);
+    if (!puzzle) return;
+    
+    setTitle(puzzle.title);
+    setPlacedWords(puzzle.words);
+    setActivePuzzleId(puzzleId);
+    
+    // Update grid and clues for the loaded puzzle
+    updateGridAndClues(puzzle.words);
+    
+    // Reset the word and clue inputs
+    setWord('');
+    setClue('');
+    setErrorMessage(null);
+    
+    // Reset the next clue number based on the loaded puzzle
+    const maxNumber = puzzle.words.reduce((max, word) => Math.max(max, word.number), 0);
+    setNextClueNumber(maxNumber + 1);
+  };
+  
+  const createNewPuzzle = () => {
+    // Reset all relevant state
+    setTitle('');
+    setPlacedWords([]);
+    setActivePuzzleId(null);
+    setWord('');
+    setClue('');
+    setErrorMessage(null);
+    setNextClueNumber(1);
+    
+    // Initialize empty grid
+    initializeGrid();
+    
+    // Reset clues
+    setClues({
+      across: [],
+      down: []
+    });
+  };
+  
   return (
     <CreatorContainer>
       <Header>
@@ -970,9 +1220,39 @@ const CrosswordCreator = ({ onBackToHome }) => {
               <span>24</span>
             </StatsItem>
           </UserSection>
+          
+          <SavedPuzzlesSection>
+            <SavedPuzzlesTitle>Your Puzzles</SavedPuzzlesTitle>
+            {savedPuzzles.map(puzzle => (
+              <PuzzleButton 
+                key={puzzle.id}
+                active={activePuzzleId === puzzle.id}
+                onClick={() => loadPuzzle(puzzle.id)}
+              >
+                {puzzle.title}
+              </PuzzleButton>
+            ))}
+            <NewPuzzleButton onClick={createNewPuzzle}>
+              <span>+</span>
+              <span>Add New</span>
+            </NewPuzzleButton>
+          </SavedPuzzlesSection>
         </LeftPanel>
         
         <CenterPanel>
+          <TitleSection>
+            <TitleLabel>Title</TitleLabel>
+            <TitleInput 
+              type="text" 
+              placeholder="Enter a title!" 
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+            <SaveButton onClick={savePuzzle}>
+              Save
+            </SaveButton>
+          </TitleSection>
+          
           <AddWordSection>
             <AddWordTitle>Add a Word</AddWordTitle>
             {errorMessage && <Message style={{ color: 'red' }}>{errorMessage}</Message>}
@@ -990,11 +1270,10 @@ const CrosswordCreator = ({ onBackToHome }) => {
                 value={clue}
                 onChange={(e) => setClue(e.target.value)}
               />
+              <AddButton onClick={addWord} disabled={!word.trim() || !clue.trim()}>
+                Add to Puzzle
+              </AddButton>
             </InputsRow>
-            
-            <AddButton onClick={addWord} disabled={!word.trim() || !clue.trim()}>
-              Add to Puzzle
-            </AddButton>
           </AddWordSection>
           
           <GridContainer>

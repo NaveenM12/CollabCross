@@ -231,7 +231,7 @@ const StatusDot = styled.div`
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background-color: ${props => props.online ? '#4caf50' : '#f44336'};
+  background-color: ${props => props.$online ? '#4caf50' : '#f44336'};
 `;
 
 const LandingPage = ({ onStartGame }) => {
@@ -301,19 +301,19 @@ const LandingPage = ({ onStartGame }) => {
               <FriendItem>
                 <RadioButton selected={false} />
                 <FriendName>Milan_J12</FriendName>
-                <StatusDot online={true} />
+                <StatusDot $online={true} />
               </FriendItem>
               
               <FriendItem>
                 <RadioButton selected={true} />
                 <FriendName>Jacob_S</FriendName>
-                <StatusDot online={false} />
+                <StatusDot $online={false} />
               </FriendItem>
               
               <FriendItem>
                 <RadioButton selected={false} />
                 <FriendName>Dr_Dome_112</FriendName>
-                <StatusDot online={true} />
+                <StatusDot $online={true} />
               </FriendItem>
             </FriendsList>
             
