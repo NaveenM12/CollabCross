@@ -524,7 +524,7 @@ const AIMessage = styled.div`
   }
 `;
 
-const CrosswordCreator = ({ onBackToHome }) => {
+const CrosswordCreator = ({ onBackToHome, initialPuzzleId }) => {
   const [gridSize, setGridSize] = useState(21);
   const [grid, setGrid] = useState([]);
   const [word, setWord] = useState('');
@@ -538,25 +538,25 @@ const CrosswordCreator = ({ onBackToHome }) => {
   const [cluesTab, setCluesTab] = useState('across');
   const [errorMessage, setErrorMessage] = useState(null);
   const [isResizing, setIsResizing] = useState(false);
-  // Track all placed words with their original positions
   const [placedWords, setPlacedWords] = useState([]);
   const [themeInput, setThemeInput] = useState('');
   const [aiMessage, setAiMessage] = useState('');
-  
-  // Add state for saved puzzles
   const [savedPuzzles, setSavedPuzzles] = useState([]);
-  const [activePuzzleId, setActivePuzzleId] = useState(null);
+  const [activePuzzleId, setActivePuzzleId] = useState(initialPuzzleId || null);
   
-  // Initialize empty grid
+  // Initialize empty grid and create default puzzles
   useEffect(() => {
     initializeGrid();
-    
-    // Initialize window.savedPuzzles for global access
     window.savedPuzzles = [];
-    
-    // Create default puzzles with proper placement logic
     createDefaultPuzzles();
   }, []);
+
+  // Add effect to handle initialPuzzleId changes
+  useEffect(() => {
+    if (initialPuzzleId && savedPuzzles.length > 0) {
+      loadPuzzle(initialPuzzleId);
+    }
+  }, [initialPuzzleId, savedPuzzles]);
   
   // Add keyboard shortcut for Command+Return
   useEffect(() => {
@@ -1403,7 +1403,7 @@ const CrosswordCreator = ({ onBackToHome }) => {
         wordsList: [
           { word: "PLAY", clue: "To engage in activity for enjoyment", direction: "across", row: 0, col: 0 },
           { word: "POST", clue: "To publish online", direction: "down", row: 0, col: 0 },
-          { word: "GAME", clue: "Activity with rules and competition", direction: "down", row: 0, col: 2 }
+          { word: "YEET", clue: "Slang; to throw something", direction: "down", row: 0, col: 3 }
         ]
       }
     ];

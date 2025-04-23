@@ -10,21 +10,24 @@ import { darkTheme } from '../styles/theme';
 const GameContainer = styled.div`
   display: flex;
   flex-direction: column;
+  align-items: center;
+  padding: 20px;
   width: 100%;
-  background-color: #1a1a1a;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  min-height: 100vh;
+  background-color: ${darkTheme.background.primary};
+  color: ${darkTheme.text.primary};
 `;
 
 const GameContent = styled.div`
   display: flex;
-  flex-direction: row;
-  padding: 0;
-  justify-content: center;
+  width: 100%;
+  max-width: 1400px;
+  gap: 40px;
+  margin-bottom: 20px;
   
-  @media (max-width: 768px) {
+  @media (max-width: 1200px) {
     flex-direction: column;
+    align-items: center;
   }
 `;
 
@@ -39,12 +42,64 @@ const LeftPanel = styled.div`
 `;
 
 const CenterPanel = styled.div`
-  flex: 0 1 auto;
+  flex: 2;
   display: flex;
   flex-direction: column;
-  padding: 0;
+  align-items: center;
+  min-width: 500px;
+`;
+
+const GridContainer = styled.div`
+  display: flex;
   justify-content: center;
   align-items: center;
+  margin: 20px 0;
+  padding: 20px;
+  background-color: ${darkTheme.background.secondary};
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+`;
+
+const Grid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(${props => props.size || 15}, 30px);
+  grid-template-rows: repeat(${props => props.size || 15}, 30px);
+  gap: 1px;
+  background-color: ${darkTheme.border.primary};
+  padding: 1px;
+  border-radius: 4px;
+`;
+
+const Cell = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: ${props => props.isBlack 
+    ? darkTheme.background.primary 
+    : darkTheme.background.elevated};
+  color: ${darkTheme.text.primary};
+  font-size: 16px;
+  font-weight: bold;
+  position: relative;
+  cursor: ${props => props.isBlack ? 'default' : 'pointer'};
+  user-select: none;
+  
+  &:hover {
+    background-color: ${props => props.isBlack 
+      ? darkTheme.background.primary 
+      : darkTheme.background.tertiary};
+  }
+`;
+
+const CellNumber = styled.div`
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  font-size: 10px;
+  font-weight: normal;
+  color: ${darkTheme.text.tertiary};
 `;
 
 const RightPanel = styled.div`
@@ -74,6 +129,23 @@ const ProgressBarFill = styled.div`
   width: ${props => props.progress}%;
   transition: width 0.3s ease;
   background-image: linear-gradient(to right, #4caf50, #8bc34a);
+`;
+
+// Add this styled component near the other styled components at the top
+const EditButton = styled.button`
+  background-color: ${darkTheme.brand.primary};
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 12px 24px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  
+  &:hover {
+    background-color: ${darkTheme.brand.secondary};
+  }
 `;
 
 // Mock data for crossword puzzle
@@ -587,10 +659,29 @@ const CrosswordGame = ({ mode, onModeChange, onBackToHome, puzzleId }) => {
         </LeftPanel>
         
         <CenterPanel>
-          <CrosswordGrid 
-            grid={grid} 
-            onCellClick={handleCellClick} 
-          />
+          <GridContainer>
+            <Grid size={grid.length}>
+              {grid.map((row, rowIndex) =>
+                row.map((cell, colIndex) => (
+                  <Cell
+                    key={`${rowIndex}-${colIndex}`}
+                    onClick={() => handleCellClick(rowIndex, colIndex)}
+                    isBlack={cell.isBlack}
+                  >
+                    {cell.number && <CellNumber>{cell.number}</CellNumber>}
+                    {cell.value}
+                  </Cell>
+                ))
+              )}
+            </Grid>
+          </GridContainer>
+          
+          {/* Only show Edit button if this is a user-created puzzle */}
+          {window.savedPuzzles?.some(p => p.id === puzzleId) && (
+            <EditButton onClick={() => onBackToHome('create', puzzleId)}>
+              Edit Crossword
+            </EditButton>
+          )}
         </CenterPanel>
         
         <RightPanel>

@@ -51,6 +51,10 @@ export default function Home() {
       setCurrentPuzzleId(puzzleId);
       setGameMode('solo');  // Playing own created puzzle is always solo mode
       setCurrentScreen('game');
+    } else if (newScreen === 'create' && puzzleId) {
+      // Navigate back to creator screen with the puzzle loaded
+      setCurrentPuzzleId(puzzleId);
+      setCurrentScreen('creator');
     } else {
       // Regular navigation back to landing page
       setCurrentScreen('landing');
@@ -72,7 +76,10 @@ export default function Home() {
           <LandingPage onStartGame={handleStartGame} />
         ) : currentScreen === 'creator' ? (
           <GameWrapper>
-            <CrosswordCreator onBackToHome={handleBackToHome} />
+            <CrosswordCreator 
+              onBackToHome={handleBackToHome}
+              initialPuzzleId={currentPuzzleId}
+            />
           </GameWrapper>
         ) : (
           <GameWrapper>
