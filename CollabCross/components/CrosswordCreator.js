@@ -544,35 +544,7 @@ const CrosswordCreator = ({ onBackToHome }) => {
   const [aiMessage, setAiMessage] = useState('');
   
   // Add state for saved puzzles
-  const [savedPuzzles, setSavedPuzzles] = useState([
-    {
-      id: 1,
-      title: "Daily Crossword",
-      words: [
-        { word: "CODE", clue: "Instructions for computers", row: 1, col: 1, direction: "across", number: 1 },
-        { word: "CHIP", clue: "Small piece of silicon", row: 1, col: 1, direction: "down", number: 1 },
-        { word: "DATA", clue: "Information for processing", row: 3, col: 1, direction: "across", number: 2 }
-      ]
-    },
-    {
-      id: 2,
-      title: "Tech Puzzle",
-      words: [
-        { word: "LINK", clue: "Web connection", row: 1, col: 1, direction: "across", number: 1 },
-        { word: "LIST", clue: "Data structure", row: 1, col: 1, direction: "down", number: 1 },
-        { word: "NET", clue: "Short for internet", row: 3, col: 1, direction: "across", number: 2 }
-      ]
-    },
-    {
-      id: 3,
-      title: "Fun with Words",
-      words: [
-        { word: "PLAY", clue: "To engage in activity for enjoyment", row: 1, col: 1, direction: "across", number: 1 },
-        { word: "POST", clue: "To publish online", row: 1, col: 1, direction: "down", number: 1 },
-        { word: "GAME", clue: "Activity with rules and competition", row: 3, col: 1, direction: "across", number: 2 }
-      ]
-    }
-  ]);
+  const [savedPuzzles, setSavedPuzzles] = useState([]);
   const [activePuzzleId, setActivePuzzleId] = useState(null);
   
   // Initialize empty grid
@@ -580,7 +552,10 @@ const CrosswordCreator = ({ onBackToHome }) => {
     initializeGrid();
     
     // Initialize window.savedPuzzles for global access
-    window.savedPuzzles = savedPuzzles;
+    window.savedPuzzles = [];
+    
+    // Create default puzzles with proper placement logic
+    createDefaultPuzzles();
   }, []);
   
   // Add keyboard shortcut for Command+Return
@@ -1282,6 +1257,7 @@ const CrosswordCreator = ({ onBackToHome }) => {
       setSavedPuzzles(updatedPuzzles);
       currentPuzzleId = updatedPuzzles[existingPuzzleIndex].id;
       setActivePuzzleId(currentPuzzleId);
+      setErrorMessage(null);
       
       // Save to window to make it accessible to other components
       window.savedPuzzles = updatedPuzzles;
@@ -1297,6 +1273,7 @@ const CrosswordCreator = ({ onBackToHome }) => {
       setSavedPuzzles(updatedPuzzles);
       currentPuzzleId = newPuzzle.id;
       setActivePuzzleId(currentPuzzleId);
+      setErrorMessage(null);
       
       // Save to window to make it accessible to other components
       window.savedPuzzles = updatedPuzzles;
@@ -1399,6 +1376,89 @@ const CrosswordCreator = ({ onBackToHome }) => {
     }, 1500);
   };
   
+  // Function to create default puzzles using the placement logic
+  const createDefaultPuzzles = () => {
+    const defaultPuzzles = [
+      {
+        id: 1,
+        title: "Daily Crossword",
+        wordsList: [
+          { word: "CODE", clue: "Instructions for computers", direction: "across", row: 0, col: 0 },
+          { word: "CHIP", clue: "Small piece of silicon", direction: "down", row: 0, col: 0 },
+          { word: "DATA", clue: "Information for processing", direction: "down", row: 0, col: 2 }
+        ]
+      },
+      {
+        id: 2,
+        title: "Tech Puzzle",
+        wordsList: [
+          { word: "LINK", clue: "Web connection", direction: "across", row: 0, col: 0 },
+          { word: "LIST", clue: "Data structure", direction: "down", row: 0, col: 0 },
+          { word: "NET", clue: "Short for internet", direction: "down", row: 0, col: 2 }
+        ]
+      },
+      {
+        id: 3,
+        title: "Fun with Words",
+        wordsList: [
+          { word: "PLAY", clue: "To engage in activity for enjoyment", direction: "across", row: 0, col: 0 },
+          { word: "POST", clue: "To publish online", direction: "down", row: 0, col: 0 },
+          { word: "GAME", clue: "Activity with rules and competition", direction: "down", row: 0, col: 2 }
+        ]
+      }
+    ];
+    
+    // Process each default puzzle
+    const processedPuzzles = defaultPuzzles.map(puzzle => {
+      const processedWords = [];
+      
+      // First, sort words by position and direction (across first, then down)
+      const sortedWordsList = [...puzzle.wordsList].sort((a, b) => {
+        if (a.row !== b.row) return a.row - b.row;
+        if (a.col !== b.col) return a.col - b.col;
+        // Put across words before down words at same position
+        if (a.direction !== b.direction) {
+          return a.direction === "across" ? -1 : 1;
+        }
+        return 0;
+      });
+      
+      // Track cell numbers
+      const cellNumbers = {};
+      let nextNumber = 1;
+      
+      // Process each word
+      sortedWordsList.forEach(wordData => {
+        const { word, clue, direction, row, col } = wordData;
+        const cellKey = `${row},${col}`;
+        
+        // Assign number if cell doesn't have one
+        if (!cellNumbers[cellKey]) {
+          cellNumbers[cellKey] = nextNumber++;
+        }
+        
+        // Add the processed word
+        processedWords.push({
+          word: word.toUpperCase(),
+          clue: clue,
+          row: row,
+          col: col,
+          direction: direction,
+          number: cellNumbers[cellKey]
+        });
+      });
+      
+      return {
+        id: puzzle.id,
+        title: puzzle.title,
+        words: processedWords
+      };
+    });
+    
+    setSavedPuzzles(processedPuzzles);
+    window.savedPuzzles = processedPuzzles;
+  };
+  
   return (
     <CreatorContainer>
       <Header>
@@ -1433,7 +1493,7 @@ const CrosswordCreator = ({ onBackToHome }) => {
             {savedPuzzles.map(puzzle => (
               <PuzzleButton 
                 key={puzzle.id}
-                active={activePuzzleId === puzzle.id}
+                active={puzzle.id === activePuzzleId}
                 onClick={() => loadPuzzle(puzzle.id)}
               >
                 {puzzle.title}
@@ -1467,8 +1527,8 @@ const CrosswordCreator = ({ onBackToHome }) => {
           </TitleSection>
           
           <AddWordSection>
+            {errorMessage && <Message style={{ color: 'red', marginTop: '-20px' }}>{errorMessage}</Message>}
             <AddWordTitle>Add a Word</AddWordTitle>
-            {errorMessage && <Message style={{ color: 'red' }}>{errorMessage}</Message>}
             
             <InputsRow>
               <StyledInput 
@@ -1498,7 +1558,7 @@ const CrosswordCreator = ({ onBackToHome }) => {
             <InputsRow>
               <ThemeInput 
                 type="text" 
-                placeholder="Enter a theme (e.g. sports, movies, science)" 
+                placeholder="Enter a theme (e.g. sports)" 
                 value={themeInput}
                 onChange={(e) => setThemeInput(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleThemeSubmit()}

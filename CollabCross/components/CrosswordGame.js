@@ -131,11 +131,41 @@ const fillPuzzle = () => {
     });
   });
   
-  // Add some pre-filled letters
-  filledGrid[1][1].value = 'H';
-  filledGrid[1][2].value = 'E';
-  filledGrid[1][3].value = 'A';
-  filledGrid[1][4].value = 'P';
+  // Add some pre-filled letters and set numbers
+  // Across words
+  filledGrid[0][0].value = 'H';
+  filledGrid[0][0].number = 1;
+  filledGrid[0][1].value = 'E';
+  filledGrid[0][2].value = 'A';
+  filledGrid[0][3].value = 'P';
+  
+  filledGrid[0][5].value = 'L';
+  filledGrid[0][5].number = 5;
+  filledGrid[0][6].value = 'E';
+  filledGrid[0][7].value = 'G';
+  filledGrid[0][8].value = 'S';
+  
+  filledGrid[0][9].value = 'A';
+  filledGrid[0][9].number = 8;
+  filledGrid[0][10].value = 'R';
+  filledGrid[0][11].value = 'G';
+  filledGrid[0][12].value = 'O';
+  filledGrid[0][13].value = 'S';
+  
+  // Down words
+  filledGrid[0][0].number = 1; // Already set for across
+  filledGrid[1][0].value = 'U';
+  filledGrid[1][0].number = 13;
+  filledGrid[2][0].value = 'R';
+  filledGrid[2][0].number = 17;
+  filledGrid[3][0].value = 'S';
+  filledGrid[3][0].number = 19;
+  
+  filledGrid[0][5].number = 5; // Already set for across
+  filledGrid[1][5].value = 'O';
+  filledGrid[1][5].number = 14;
+  filledGrid[2][5].value = 'L';
+  filledGrid[2][5].number = 18;
   
   return filledGrid;
 };
@@ -244,11 +274,29 @@ const CrosswordGame = ({ mode, onModeChange, onBackToHome, puzzleId }) => {
     if (puzzle) {
       setPuzzleTitle(puzzle.title);
       
+      // Find the maximum dimensions needed for the puzzle
+      let maxRow = 0;
+      let maxCol = 0;
+      
+      puzzle.words.forEach(wordData => {
+        if (wordData.direction === 'across') {
+          maxRow = Math.max(maxRow, wordData.row);
+          maxCol = Math.max(maxCol, wordData.col + wordData.word.length - 1);
+        } else {
+          maxRow = Math.max(maxRow, wordData.row + wordData.word.length - 1);
+          maxCol = Math.max(maxCol, wordData.col);
+        }
+      });
+      
+      // Add some padding around the puzzle
+      const padding = 2;
+      const gridSize = Math.max(15, Math.max(maxRow, maxCol) + padding);
+      
       // Create a completely empty grid
-      const newGrid = Array(15).fill().map(() => 
-        Array(15).fill().map(() => ({ 
+      const newGrid = Array(gridSize).fill().map(() => 
+        Array(gridSize).fill().map(() => ({ 
           value: '', 
-          isBlack: true, // Start with all black cells
+          isBlack: true,
           number: null,
           correctValue: null
         }))
@@ -264,84 +312,98 @@ const CrosswordGame = ({ mode, onModeChange, onBackToHome, puzzleId }) => {
         return a.col - b.col;
       });
       
-      // First pass: Clear paths for words and set numbers
-      sortedWords.forEach(wordData => {
-        const { word, clue, row, col, direction, number } = wordData;
+      // First pass: Process across words to establish initial numbers
+      let nextNumber = 1;
+      const cellNumbers = {}; // Track cell numbers by position
+      
+      sortedWords.filter(word => word.direction === 'across').forEach(wordData => {
+        const { word, clue, row, col } = wordData;
+        const cellKey = `${row},${col}`;
         
-        // Convert 1-based indices to 0-based for the grid
-        // Our grid is 0-indexed, but puzzle data uses 1-indexed positions
-        const gridRow = row - 1;
-        const gridCol = col - 1;
+        // Assign number if cell doesn't have one
+        if (!cellNumbers[cellKey]) {
+          cellNumbers[cellKey] = nextNumber++;
+        }
         
-        // Add the clue to the appropriate array
-        if (direction === 'across') {
-          acrossClues.push({ number, clue, answer: word });
-          
-          // Clear cells for this word (make them not black)
-          for (let i = 0; i < word.length; i++) {
-            if (gridRow >= 0 && gridRow < newGrid.length && 
-                (gridCol + i) >= 0 && (gridCol + i) < newGrid[0].length) {
-              newGrid[gridRow][gridCol + i].isBlack = false;
-            }
+        // Add clue with the cell's number
+        acrossClues.push({ 
+          number: cellNumbers[cellKey], 
+          clue, 
+          answer: word 
+        });
+        
+        // Clear cells for this word
+        for (let i = 0; i < word.length; i++) {
+          if (row >= 0 && row < newGrid.length && 
+              (col + i) >= 0 && (col + i) < newGrid[0].length) {
+            newGrid[row][col + i].isBlack = false;
           }
-          
-          // Set the number on the first cell if it doesn't have one
-          if (gridRow >= 0 && gridRow < newGrid.length && 
-              gridCol >= 0 && gridCol < newGrid[0].length) {
-            if (!newGrid[gridRow][gridCol].number) {
-              newGrid[gridRow][gridCol].number = number;
-            }
-          }
-        } else { // direction === 'down'
-          downClues.push({ number, clue, answer: word });
-          
-          // Clear cells for this word (make them not black)
-          for (let i = 0; i < word.length; i++) {
-            if ((gridRow + i) >= 0 && (gridRow + i) < newGrid.length && 
-                gridCol >= 0 && gridCol < newGrid[0].length) {
-              newGrid[gridRow + i][gridCol].isBlack = false;
-            }
-          }
-          
-          // Set the number on the first cell if it doesn't have one
-          if (gridRow >= 0 && gridRow < newGrid.length && 
-              gridCol >= 0 && gridCol < newGrid[0].length) {
-            if (!newGrid[gridRow][gridCol].number) {
-              newGrid[gridRow][gridCol].number = number;
-            }
-          }
+        }
+        
+        // Set the number on the first cell
+        if (row >= 0 && row < newGrid.length && 
+            col >= 0 && col < newGrid[0].length) {
+          newGrid[row][col].number = cellNumbers[cellKey];
         }
       });
       
-      // Second pass: Place the correct letters in the grid
-      sortedWords.forEach(wordData => {
-        const { word, row, col, direction } = wordData;
+      // Second pass: Process down words, reusing numbers when possible
+      sortedWords.filter(word => word.direction === 'down').forEach(wordData => {
+        const { word, clue, row, col } = wordData;
+        const cellKey = `${row},${col}`;
         
-        // Convert 1-based indices to 0-based for the grid
-        const gridRow = row - 1;
-        const gridCol = col - 1;
+        // Assign number if cell doesn't have one
+        if (!cellNumbers[cellKey]) {
+          cellNumbers[cellKey] = nextNumber++;
+        }
         
-        // Place letters in the grid
+        // Add clue with the cell's number
+        downClues.push({ 
+          number: cellNumbers[cellKey], 
+          clue, 
+          answer: word 
+        });
+        
+        // Clear cells for this word
         for (let i = 0; i < word.length; i++) {
-          const letter = word[i];
-          
-          if (direction === 'across') {
-            if (gridRow >= 0 && gridRow < newGrid.length && 
-                (gridCol + i) >= 0 && (gridCol + i) < newGrid[0].length) {
-              newGrid[gridRow][gridCol + i].correctValue = letter;
-            }
-          } else { // direction === 'down'
-            if ((gridRow + i) >= 0 && (gridRow + i) < newGrid.length && 
-                gridCol >= 0 && gridCol < newGrid[0].length) {
-              newGrid[gridRow + i][gridCol].correctValue = letter;
-            }
+          if ((row + i) >= 0 && (row + i) < newGrid.length && 
+              col >= 0 && col < newGrid[0].length) {
+            newGrid[row + i][col].isBlack = false;
           }
+        }
+        
+        // Set the number on the first cell
+        if (row >= 0 && row < newGrid.length && 
+            col >= 0 && col < newGrid[0].length) {
+          newGrid[row][col].number = cellNumbers[cellKey];
         }
       });
       
       // Sort clues by number
       acrossClues.sort((a, b) => a.number - b.number);
       downClues.sort((a, b) => a.number - b.number);
+      
+      // Third pass: Place the correct letters in the grid
+      sortedWords.forEach(wordData => {
+        const { word, row, col, direction } = wordData;
+        
+        // Place letters in the grid
+        for (let i = 0; i < word.length; i++) {
+          const letter = word[i];
+          
+          if (direction === 'across') {
+            if (row >= 0 && row < newGrid.length && 
+                (col + i) >= 0 && (col + i) < newGrid[0].length) {
+              newGrid[row][col + i].correctValue = letter;
+            }
+          } else { // direction === 'down'
+            if ((row + i) >= 0 && (row + i) < newGrid.length && 
+                col >= 0 && col < newGrid[0].length) {
+              newGrid[row + i][col].correctValue = letter;
+            }
+          }
+        }
+      });
       
       setClues({
         across: acrossClues,

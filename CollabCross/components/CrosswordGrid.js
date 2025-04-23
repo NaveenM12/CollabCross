@@ -10,8 +10,8 @@ const GridContainer = styled.div`
 
 const Grid = styled.div`
   display: grid;
-  grid-template-columns: repeat(15, 30px);
-  grid-template-rows: repeat(15, 30px);
+  grid-template-columns: repeat(${props => props.size}, 30px);
+  grid-template-rows: repeat(${props => props.size}, 30px);
   gap: 1px;
   border: 2px solid #444;
   background-color: #444;
@@ -122,30 +122,21 @@ const CrosswordGrid = ({ grid, onCellClick }) => {
     return false;
   };
 
-  const getClassName = (row, col) => {
-    if (selectedCell && selectedCell.row === row && selectedCell.col === col) {
-      return 'selected';
-    }
-    if (selectedCell && isInSelectedWord(row, col)) {
-      return 'highlighted';
-    }
-    return '';
-  };
-
   return (
     <GridContainer>
-      <Grid>
+      <Grid size={grid.length}>
         {grid.map((row, rowIndex) => 
           row.map((cell, colIndex) => (
-            <Cell
+            <Cell 
               key={`${rowIndex}-${colIndex}`}
               isBlack={cell.isBlack}
-              className={getClassName(rowIndex, colIndex)}
+              className={`
+                ${selectedCell && selectedCell.row === rowIndex && selectedCell.col === colIndex ? 'selected' : ''}
+                ${isInSelectedWord(rowIndex, colIndex) ? 'highlighted' : ''}
+              `}
               onClick={() => handleCellClick(rowIndex, colIndex)}
             >
-              {cell.number && (
-                <CellNumber>{cell.number}</CellNumber>
-              )}
+              {cell.number && <CellNumber>{cell.number}</CellNumber>}
               {cell.value}
             </Cell>
           ))
