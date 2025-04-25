@@ -19,6 +19,8 @@ const Logo = styled.div`
   margin-bottom: 20px;
   line-height: 1;
   text-align: center;
+  display: flex;
+  align-items: center;
 `;
 
 const CollabText = styled.span`
@@ -27,11 +29,21 @@ const CollabText = styled.span`
 
 const CrossText = styled.span`
   color: ${darkTheme.text.primary};
+  display: flex;
+  align-items: center;
+  &:before {
+    content: "×";
+    font-size: 60px;
+    margin: 0 8px;
+  }
 `;
 
 const TitleText = styled.h1`
   font-size: 28px;
   margin-bottom: 40px;
+  text-align: center;
+  font-weight: normal;
+  color: ${darkTheme.text.secondary};
 `;
 
 const ContentWrapper = styled.div`
@@ -39,7 +51,7 @@ const ContentWrapper = styled.div`
   width: 100%;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 20px;
+  gap: 30px;
   
   @media (max-width: 768px) {
     flex-direction: column;
@@ -49,9 +61,16 @@ const ContentWrapper = styled.div`
 const LeftPanel = styled.div`
   flex: 1;
   background-color: ${darkTheme.background.secondary};
-  border-radius: 8px;
-  padding: 20px;
+  border-radius: 12px;
+  padding: 30px;
   position: relative;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
 `;
 
 const PuzzleSelector = styled.div`
@@ -65,6 +84,20 @@ const PuzzleTitle = styled.div`
   align-items: center;
   justify-content: center;
   gap: 10px;
+  margin-bottom: 30px;
+  color: ${darkTheme.brand.primary};
+  position: relative;
+  
+  &:after {
+    content: "";
+    position: absolute;
+    bottom: -15px;
+    left: 25%;
+    right: 25%;
+    height: 2px;
+    background: ${darkTheme.brand.primary};
+    opacity: 0.3;
+  }
 `;
 
 const PuzzleDate = styled.div`
@@ -85,13 +118,16 @@ const ModeOption = styled.div`
   align-items: center;
   gap: 15px;
   cursor: pointer;
-  padding: 10px;
+  padding: 15px;
   font-size: 20px;
-  border-radius: 8px;
-  transition: background-color 0.2s;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+  background-color: ${props => props.selected ? `${darkTheme.background.tertiary}` : 'transparent'};
+  border: 1px solid ${props => props.selected ? darkTheme.brand.primary : 'transparent'};
   
   &:hover {
     background-color: ${darkTheme.background.tertiary};
+    transform: translateX(5px);
   }
 `;
 
@@ -103,6 +139,7 @@ const RadioButton = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 `;
 
 const RadioButtonInner = styled.div`
@@ -113,34 +150,88 @@ const RadioButtonInner = styled.div`
 `;
 
 const ModeIcon = styled.div`
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #1a56ff;
-  font-size: 24px;
+  color: ${darkTheme.brand.primary};
+  font-size: 26px;
+  flex-shrink: 0;
+`;
+
+const ModeText = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const ModeTitle = styled.div`
+  font-weight: bold;
+`;
+
+const ModeDescription = styled.div`
+  font-size: 14px;
+  color: ${darkTheme.text.secondary};
+  margin-top: 4px;
 `;
 
 const StartButton = styled.button`
   background-color: ${darkTheme.brand.primary};
   color: white;
   border: none;
-  border-radius: 8px;
-  padding: 12px 24px;
+  border-radius: 10px;
+  padding: 16px 24px;
   font-size: 18px;
+  font-weight: bold;
   cursor: pointer;
-  margin-top: 20px;
+  margin-top: 30px;
   width: 100%;
-  transition: background-color 0.2s;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
   
   &:hover {
     background-color: ${darkTheme.brand.secondary};
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  &:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
   
   &:disabled {
     background-color: ${darkTheme.background.tertiary};
     cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+  
+  &:after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: linear-gradient(
+      120deg,
+      rgba(255, 255, 255, 0) 30%,
+      rgba(255, 255, 255, 0.1),
+      rgba(255, 255, 255, 0) 70%
+    );
+    transform: translateX(-100%);
+  }
+  
+  &:hover:not(:disabled):after {
+    animation: shine 1.5s infinite;
+  }
+  
+  @keyframes shine {
+    100% {
+      transform: translateX(100%);
+    }
   }
 `;
 
@@ -157,34 +248,69 @@ const RightPanel = styled.div`
 
 const OrDivider = styled.div`
   text-align: center;
-  font-size: 24px;
+  font-size: 18px;
   font-weight: bold;
   margin: 15px 0;
+  color: ${darkTheme.text.tertiary};
+  position: relative;
+  
+  &:before, &:after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 40%;
+    height: 1px;
+    background: ${darkTheme.border.primary};
+  }
+  
+  &:before {
+    left: 0;
+  }
+  
+  &:after {
+    right: 0;
+  }
 `;
 
 const OptionCard = styled.div`
   border: 1px solid ${darkTheme.border.primary};
-  border-radius: 8px;
-  padding: 15px;
+  border-radius: 12px;
+  padding: 20px;
   background-color: ${darkTheme.background.secondary};
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  
+  &:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-5px);
+  }
 `;
 
 const RandomPartnerButton = styled.button`
   width: 100%;
-  padding: 15px;
+  padding: 16px;
   background-color: ${darkTheme.background.secondary};
   border: 2px solid ${darkTheme.brand.primary};
-  border-radius: 8px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 12px;
   font-size: 18px;
   cursor: pointer;
   color: ${darkTheme.brand.primary};
+  font-weight: bold;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   
   &:hover {
     background-color: ${darkTheme.background.tertiary};
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  &:active {
+    transform: translateY(-2px);
   }
 `;
 
@@ -192,12 +318,15 @@ const FriendsHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid ${darkTheme.border.primary};
+  padding-bottom: 10px;
 `;
 
 const FriendsTitle = styled.h3`
   font-size: 20px;
   margin: 0;
+  color: ${darkTheme.brand.primary};
 `;
 
 const AddFriendButton = styled.button`
@@ -208,12 +337,19 @@ const AddFriendButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
+  color: ${darkTheme.text.secondary};
+  transition: color 0.2s, transform 0.2s;
+  
+  &:hover {
+    color: ${darkTheme.brand.primary};
+    transform: scale(1.2);
+  }
 `;
 
 const FriendsList = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 `;
 
 const FriendItem = styled.div`
@@ -221,11 +357,13 @@ const FriendItem = styled.div`
   align-items: center;
   gap: 15px;
   cursor: pointer;
-  padding: 8px;
-  border-radius: 6px;
+  padding: 10px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
   
   &:hover {
     background-color: ${darkTheme.background.tertiary};
+    transform: translateX(5px);
   }
 `;
 
@@ -239,6 +377,7 @@ const StatusDot = styled.div`
   height: 12px;
   border-radius: 50%;
   background-color: ${props => props.$online ? '#4caf50' : '#f44336'};
+  box-shadow: 0 0 10px ${props => props.$online ? 'rgba(76, 175, 80, 0.5)' : 'rgba(244, 67, 54, 0.5)'};
 `;
 
 const LandingPage = ({ onStartGame }) => {
@@ -268,23 +407,37 @@ const LandingPage = ({ onStartGame }) => {
           <PuzzleSelector>
             <PuzzleTitle>Select Mode</PuzzleTitle>
             <ModeSelector>
-              <ModeOption onClick={() => setSelectedMode('solo')}>
+              <ModeOption selected={selectedMode === 'solo'} onClick={() => setSelectedMode('solo')}>
                 <RadioButton>
                   {selectedMode === 'solo' && <RadioButtonInner />}
                 </RadioButton>
-                Versus
+                <ModeIcon>🏆</ModeIcon>
+                <ModeText>
+                  <ModeTitle>Versus Mode</ModeTitle>
+                  <ModeDescription>Compete against friends to solve puzzles fastest</ModeDescription>
+                </ModeText>
               </ModeOption>
-              <ModeOption onClick={() => setSelectedMode('collab')}>
+              
+              <ModeOption selected={selectedMode === 'collab'} onClick={() => setSelectedMode('collab')}>
                 <RadioButton>
                   {selectedMode === 'collab' && <RadioButtonInner />}
                 </RadioButton>
-                Collaborative Play
+                <ModeIcon>👥</ModeIcon>
+                <ModeText>
+                  <ModeTitle>Collaborative Play</ModeTitle>
+                  <ModeDescription>Work together to solve challenging puzzles</ModeDescription>
+                </ModeText>
               </ModeOption>
-              <ModeOption onClick={() => setSelectedMode('creator')}>
+              
+              <ModeOption selected={selectedMode === 'creator'} onClick={() => setSelectedMode('creator')}>
                 <RadioButton>
                   {selectedMode === 'creator' && <RadioButtonInner />}
                 </RadioButton>
-                Create Puzzle
+                <ModeIcon>✏️</ModeIcon>
+                <ModeText>
+                  <ModeTitle>Create Puzzle</ModeTitle>
+                  <ModeDescription>Design your own crossword puzzles to share</ModeDescription>
+                </ModeText>
               </ModeOption>
             </ModeSelector>
             <StartButton onClick={handleStartGame} disabled={!selectedMode}>
