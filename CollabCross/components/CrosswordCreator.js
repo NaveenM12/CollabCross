@@ -298,6 +298,7 @@ const Cell = styled.div`
   font-size: 16px;
   font-weight: bold;
   position: relative;
+  cursor: pointer;
 `;
 
 const CellNumber = styled.div`
@@ -524,6 +525,65 @@ const AIMessage = styled.div`
   }
 `;
 
+// Add new styled components for the popups
+const PopupOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+`;
+
+const PopupContent = styled.div`
+  background: ${darkTheme.background.elevated};
+  padding: 30px;
+  border-radius: 12px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+`;
+
+const PopupTitle = styled.h3`
+  font-size: 24px;
+  margin: 0 0 15px 0;
+  color: ${props => props.isSuccess ? darkTheme.brand.primary : '#ff4444'};
+`;
+
+const PopupMessage = styled.p`
+  font-size: 16px;
+  margin: 0 0 20px 0;
+  color: ${darkTheme.text.primary};
+  line-height: 1.5;
+`;
+
+const PopupButton = styled.button`
+  background: ${props => props.isSuccess ? darkTheme.brand.primary : '#ff4444'};
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+`;
+
+const PopupEmoji = styled.div`
+  font-size: 48px;
+  margin-bottom: 20px;
+`;
+
 const CrosswordCreator = ({ onBackToHome, initialPuzzleId }) => {
   const [gridSize, setGridSize] = useState(21);
   const [grid, setGrid] = useState([]);
@@ -543,6 +603,10 @@ const CrosswordCreator = ({ onBackToHome, initialPuzzleId }) => {
   const [aiMessage, setAiMessage] = useState('');
   const [savedPuzzles, setSavedPuzzles] = useState([]);
   const [activePuzzleId, setActivePuzzleId] = useState(initialPuzzleId || null);
+  const [lastLetterToggle, setLastLetterToggle] = useState(true);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [showErrorPopup, setShowErrorPopup] = useState(false);
+  const [isComplete, setIsComplete] = useState(false);
   
   // Initialize empty grid and create default puzzles
   useEffect(() => {
@@ -631,7 +695,7 @@ const CrosswordCreator = ({ onBackToHome, initialPuzzleId }) => {
     }
     
     // Try to find the best arrangement with the new word
-    const result = findOptimalArrangement(currentPlacedWords, wordToPlace);
+    const result = findOptimalArrangement(currentWords, newWord);
     
     if (result) {
       const { updatedWords, newWordPlacement } = result;
@@ -1244,15 +1308,18 @@ const CrosswordCreator = ({ onBackToHome, initialPuzzleId }) => {
     const existingPuzzleIndex = savedPuzzles.findIndex(p => p.title.toLowerCase() === title.toLowerCase());
     
     let currentPuzzleId;
+    let puzzleData;
     
     if (existingPuzzleIndex >= 0) {
       // Update existing puzzle
       const updatedPuzzles = [...savedPuzzles];
-      updatedPuzzles[existingPuzzleIndex] = {
+      puzzleData = {
         ...updatedPuzzles[existingPuzzleIndex],
         title: title,
-        words: placedWords
+        words: placedWords,
+        grid: grid // Add the current grid state
       };
+      updatedPuzzles[existingPuzzleIndex] = puzzleData;
       
       setSavedPuzzles(updatedPuzzles);
       currentPuzzleId = updatedPuzzles[existingPuzzleIndex].id;
@@ -1263,15 +1330,16 @@ const CrosswordCreator = ({ onBackToHome, initialPuzzleId }) => {
       window.savedPuzzles = updatedPuzzles;
     } else {
       // Create new puzzle
-      const newPuzzle = {
+      puzzleData = {
         id: Date.now(), // Use timestamp as a simple unique ID
         title: title,
-        words: placedWords
+        words: placedWords,
+        grid: grid // Add the current grid state
       };
       
-      const updatedPuzzles = [...savedPuzzles, newPuzzle];
+      const updatedPuzzles = [...savedPuzzles, puzzleData];
       setSavedPuzzles(updatedPuzzles);
-      currentPuzzleId = newPuzzle.id;
+      currentPuzzleId = puzzleData.id;
       setActivePuzzleId(currentPuzzleId);
       setErrorMessage(null);
       
@@ -1279,8 +1347,17 @@ const CrosswordCreator = ({ onBackToHome, initialPuzzleId }) => {
       window.savedPuzzles = updatedPuzzles;
     }
     
-    // Navigate to play the crossword
-    onBackToHome('play', currentPuzzleId);
+    // Pass additional play mode data
+    const playModeData = {
+      puzzleId: currentPuzzleId,
+      mode: 'play',
+      gridData: grid,
+      words: placedWords,
+      clues: clues
+    };
+    
+    // Navigate to play the crossword with the additional data
+    onBackToHome('play', currentPuzzleId, playModeData);
   };
   
   // Add a new function to handle the theme submission
@@ -1459,6 +1536,73 @@ const CrosswordCreator = ({ onBackToHome, initialPuzzleId }) => {
     window.savedPuzzles = processedPuzzles;
   };
   
+  const handleLastLetterEntry = () => {
+    // Toggle the last letter state
+    setLastLetterToggle(prev => !prev);
+    
+    // Show appropriate popup based on the new state
+    if (!lastLetterToggle) {
+      setShowSuccessPopup(true);
+      setShowErrorPopup(false);
+    } else {
+      setShowErrorPopup(true);
+      setShowSuccessPopup(false);
+    }
+  };
+
+  const closePopups = () => {
+    setShowSuccessPopup(false);
+    setShowErrorPopup(false);
+  };
+
+  const checkCompletion = () => {
+    // Check if all cells that should have letters have values
+    const isFilled = grid.every((row, rowIndex) => 
+      row.every((cell, colIndex) => {
+        if (cell.isBlack) return true; // Black cells are always "filled"
+        
+        // Check if this cell is part of any word
+        const isPartOfWord = placedWords.some(word => {
+          if (word.direction === "across") {
+            return rowIndex === word.row && 
+                   colIndex >= word.col && 
+                   colIndex < word.col + word.word.length;
+          } else {
+            return colIndex === word.col && 
+                   rowIndex >= word.row && 
+                   rowIndex < word.row + word.word.length;
+          }
+        });
+        
+        // If it's part of a word, it should have a value
+        return !isPartOfWord || cell.value !== '';
+      })
+    );
+    
+    setIsComplete(isFilled);
+    return isFilled;
+  };
+
+  const handleCellClick = (rowIndex, colIndex) => {
+    // Check if this is the last letter of any word
+    const isLastLetter = placedWords.some(word => {
+      if (word.direction === "across") {
+        return rowIndex === word.row && colIndex === word.col + word.word.length - 1;
+      } else {
+        return colIndex === word.col && rowIndex === word.row + word.word.length - 1;
+      }
+    });
+
+    if (isLastLetter) {
+      handleLastLetterEntry();
+    }
+
+    // Check if the crossword is complete after this click
+    if (checkCompletion()) {
+      setShowSuccessPopup(true);
+    }
+  };
+
   return (
     <CreatorContainer>
       <Header>
@@ -1580,15 +1724,18 @@ const CrosswordCreator = ({ onBackToHome, initialPuzzleId }) => {
           <GridContainer>
             <Grid size={gridSize}>
               {grid.map((row, rowIndex) => 
-                row.map((cell, colIndex) => (
-                  <Cell 
-                    key={`${rowIndex}-${colIndex}`} 
-                    isBlack={cell.isBlack}
-                  >
-                    {cell.number && <CellNumber>{cell.number}</CellNumber>}
-                    {cell.value}
-                  </Cell>
-                ))
+                row.map((cell, colIndex) => {
+                  return (
+                    <Cell 
+                      key={`${rowIndex}-${colIndex}`} 
+                      isBlack={cell.isBlack}
+                      onClick={() => handleCellClick(rowIndex, colIndex)}
+                    >
+                      {cell.number && <CellNumber>{cell.number}</CellNumber>}
+                      {cell.value}
+                    </Cell>
+                  );
+                })
               )}
             </Grid>
           </GridContainer>
@@ -1645,6 +1792,37 @@ const CrosswordCreator = ({ onBackToHome, initialPuzzleId }) => {
           </CluesList>
         </RightPanel>
       </MainContent>
+
+      {/* Add the popups */}
+      {showSuccessPopup && (
+        <PopupOverlay onClick={closePopups}>
+          <PopupContent onClick={e => e.stopPropagation()}>
+            <PopupEmoji>🎉</PopupEmoji>
+            <PopupTitle isSuccess={true}>Congratulations!</PopupTitle>
+            <PopupMessage>
+              You've successfully completed the crossword puzzle! Well done!
+            </PopupMessage>
+            <PopupButton isSuccess={true} onClick={closePopups}>
+              Continue
+            </PopupButton>
+          </PopupContent>
+        </PopupOverlay>
+      )}
+
+      {showErrorPopup && (
+        <PopupOverlay onClick={closePopups}>
+          <PopupContent onClick={e => e.stopPropagation()}>
+            <PopupEmoji>❌</PopupEmoji>
+            <PopupTitle isSuccess={false}>Not Quite Right</PopupTitle>
+            <PopupMessage>
+              One or more squares are incorrect. Keep trying!
+            </PopupMessage>
+            <PopupButton isSuccess={false} onClick={closePopups}>
+              Try Again
+            </PopupButton>
+          </PopupContent>
+        </PopupOverlay>
+      )}
     </CreatorContainer>
   );
 };
