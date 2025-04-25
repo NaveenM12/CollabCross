@@ -1584,22 +1584,110 @@ const CrosswordCreator = ({ onBackToHome, initialPuzzleId }) => {
   };
 
   const handleCellClick = (rowIndex, colIndex) => {
-    // Check if this is the last letter of any word
-    const isLastLetter = placedWords.some(word => {
-      if (word.direction === "across") {
-        return rowIndex === word.row && colIndex === word.col + word.word.length - 1;
-      } else {
-        return colIndex === word.col && rowIndex === word.row + word.word.length - 1;
+    // Clone the current grid
+    const newGrid = [...grid.map(row => [...row.map(cell => ({...cell}))])];
+    
+    // Find if this cell is part of a word
+    let isPartOfWord = false;
+    placedWords.some(word => {
+      if (word.direction === "across" && 
+          rowIndex === word.row && 
+          colIndex >= word.col && 
+          colIndex < word.col + word.word.length) {
+        isPartOfWord = true;
+        return true;
+      } else if (word.direction === "down" && 
+                colIndex === word.col && 
+                rowIndex >= word.row && 
+                rowIndex < word.row + word.word.length) {
+        isPartOfWord = true;
+        return true;
       }
+      return false;
     });
-
-    if (isLastLetter) {
-      handleLastLetterEntry();
-    }
-
-    // Check if the crossword is complete after this click
-    if (checkCompletion()) {
+    
+    if (!isPartOfWord) return; // Skip clicks on cells that aren't part of any word
+    
+    // Add the correct letter
+    placedWords.some(word => {
+      if (word.direction === "across" && 
+          rowIndex === word.row && 
+          colIndex >= word.col && 
+          colIndex < word.col + word.word.length) {
+        newGrid[rowIndex][colIndex].value = word.word[colIndex - word.col];
+        return true;
+      } else if (word.direction === "down" && 
+                colIndex === word.col && 
+                rowIndex >= word.row && 
+                rowIndex < word.row + word.word.length) {
+        newGrid[rowIndex][colIndex].value = word.word[rowIndex - word.row];
+        return true;
+      }
+      return false;
+    });
+    
+    // Update the grid with the new letter
+    setGrid(newGrid);
+    
+    // Check if puzzle is now complete after this click
+    let isComplete = true;
+    let lastLetterCell = null;
+    
+    // Scan the grid to check if all word cells are filled
+    newGrid.forEach((row, r) => {
+      row.forEach((cell, c) => {
+        if (cell.isBlack) return; // Skip black cells
+        
+        // Check if this cell is part of any word
+        const cellInWord = placedWords.some(word => {
+          if (word.direction === "across") {
+            return r === word.row && 
+                   c >= word.col && 
+                   c < word.col + word.word.length;
+          } else {
+            return c === word.col && 
+                   r >= word.row && 
+                   r < word.row + word.word.length;
+          }
+        });
+        
+        // If it's part of a word and doesn't have a value, the puzzle isn't complete
+        if (cellInWord && (cell.value === '' || cell.value === undefined)) {
+          isComplete = false;
+        }
+        
+        // Check if this is the last letter of any word
+        placedWords.forEach(word => {
+          if ((word.direction === "across" && r === word.row && c === word.col + word.word.length - 1) ||
+              (word.direction === "down" && c === word.col && r === word.row + word.word.length - 1)) {
+            // This is the last letter of a word
+            lastLetterCell = { row: r, col: c };
+          }
+        });
+      });
+    });
+    
+    // If the puzzle is complete and we just clicked on what might be the last letter
+    if (isComplete && rowIndex === lastLetterCell?.row && colIndex === lastLetterCell?.col) {
+      // This was the final cell to complete the puzzle
+      if (lastLetterToggle) {
+        // Show success popup for completing the puzzle correctly
+        setShowSuccessPopup(true);
+        setShowErrorPopup(false);
+      } else {
+        // Show the incorrect state with a period character
+        newGrid[rowIndex][colIndex].value = '.';
+        setGrid(newGrid);
+        setShowErrorPopup(true);
+        setShowSuccessPopup(false);
+      }
+      // Toggle the state for next time
+      setLastLetterToggle(prev => !prev);
+    } else if (isComplete) {
+      // If we completed the puzzle but not by clicking the last letter
+      // still show success popup
       setShowSuccessPopup(true);
+      setShowErrorPopup(false);
     }
   };
 

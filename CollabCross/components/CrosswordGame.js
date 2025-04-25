@@ -148,6 +148,145 @@ const EditButton = styled.button`
   }
 `;
 
+// Add popup styled components
+const PopupOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+`;
+
+const PopupContent = styled.div`
+  background: ${darkTheme.background.elevated};
+  padding: 30px;
+  border-radius: 12px;
+  max-width: 450px;
+  width: 90%;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+`;
+
+const PopupTitle = styled.h3`
+  font-size: 24px;
+  margin: 0 0 15px 0;
+  color: ${props => props.isSuccess ? darkTheme.brand.primary : '#ff4444'};
+`;
+
+const PopupMessage = styled.p`
+  font-size: 16px;
+  margin: 0 0 20px 0;
+  color: ${darkTheme.text.primary};
+  line-height: 1.5;
+`;
+
+const PopupButton = styled.button`
+  background: ${props => props.isSuccess ? darkTheme.brand.primary : '#ff4444'};
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+`;
+
+const PopupEmoji = styled.div`
+  font-size: 48px;
+  margin-bottom: 20px;
+`;
+
+// Add styled components for the completion time display
+const CompletionTimeWrapper = styled.div`
+  margin: 15px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const CompletionTimeLabel = styled.div`
+  font-size: 14px;
+  color: ${darkTheme.text.secondary};
+  margin-bottom: 5px;
+`;
+
+const CompletionTimeValue = styled.div`
+  font-size: 36px;
+  font-weight: bold;
+  color: ${darkTheme.brand.primary};
+  font-family: monospace;
+`;
+
+// Add styled components for the leaderboard
+const LeaderboardContainer = styled.div`
+  margin-top: 25px;
+  width: 100%;
+  border-top: 1px solid ${darkTheme.border.primary};
+  padding-top: 15px;
+`;
+
+const LeaderboardTitle = styled.h4`
+  margin: 0 0 15px 0;
+  font-size: 18px;
+  color: ${darkTheme.text.primary};
+`;
+
+const LeaderboardTable = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+`;
+
+const LeaderboardRow = styled.tr`
+  &:nth-child(odd) {
+    background-color: ${darkTheme.background.secondary};
+  }
+  
+  ${props => props.isUser && `
+    background-color: ${darkTheme.background.tertiary} !important;
+    font-weight: bold;
+  `}
+`;
+
+const LeaderboardCell = styled.td`
+  padding: 8px 10px;
+  font-size: 14px;
+  
+  &:first-child {
+    width: 30px;
+    text-align: center;
+  }
+  
+  ${props => props.highlight && `
+    color: ${darkTheme.brand.primary};
+    font-weight: bold;
+  `}
+`;
+
+const LeaderboardHeader = styled.th`
+  padding: 8px 10px;
+  font-size: 14px;
+  color: ${darkTheme.text.secondary};
+  font-weight: normal;
+  border-bottom: 1px solid ${darkTheme.border.primary};
+  
+  &:first-child {
+    width: 30px;
+    text-align: center;
+  }
+`;
+
 // Mock data for crossword puzzle
 const crosswordData = {
   grid: Array(15).fill().map(() => Array(15).fill({ value: '', isBlack: false })),
@@ -266,6 +405,12 @@ const CrosswordGame = ({ mode, onModeChange, onBackToHome, puzzleId }) => {
   const [progress, setProgress] = useState(0);
   const [totalCells, setTotalCells] = useState(0);
   const [filledCells, setFilledCells] = useState(0);
+  
+  // Add states for popups and last letter toggle
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [showErrorPopup, setShowErrorPopup] = useState(false);
+  const [lastLetterToggle, setLastLetterToggle] = useState(true);
+  const [completionTime, setCompletionTime] = useState('');
   
   // Create a timer using useRef and useEffect
   const timerRef = useRef(null);
@@ -512,6 +657,32 @@ const CrosswordGame = ({ mode, onModeChange, onBackToHome, puzzleId }) => {
     }
   };
 
+  // Add closePopups function
+  const closePopups = () => {
+    setShowSuccessPopup(false);
+    setShowErrorPopup(false);
+    
+    // If closing error popup and timer is stopped, restart it
+    if (showErrorPopup && !timerRef.current) {
+      timerRef.current = setInterval(() => {
+        setSecondsElapsed(prev => prev + 1);
+      }, 1000);
+    }
+  };
+
+  // Add checkIfPuzzleCompleted function
+  const checkIfPuzzleCompleted = (grid) => {
+    for (let r = 0; r < grid.length; r++) {
+      for (let c = 0; c < grid[r].length; c++) {
+        if (!grid[r][c].isBlack && !grid[r][c].value) {
+          return false; // Found an empty cell
+        }
+      }
+    }
+    return true; // All cells are filled
+  };
+
+  // Update handleCellClick function
   const handleCellClick = (row, col) => {
     if (!grid[row][col] || grid[row][col].isBlack) return;
     
@@ -545,6 +716,34 @@ const CrosswordGame = ({ mode, onModeChange, onBackToHome, puzzleId }) => {
         }
         
         setPlayers(newPlayers);
+        
+        // Check if this was the last cell to complete the puzzle
+        const willComplete = checkIfPuzzleCompleted(newGrid);
+        if (willComplete) {
+          // This was the final cell to complete the puzzle!
+          if (lastLetterToggle) {
+            // Stop the timer
+            if (timerRef.current) {
+              clearInterval(timerRef.current);
+              timerRef.current = null;
+            }
+            // Get the current formatted time
+            const minutes = Math.floor(secondsElapsed / 60);
+            const seconds = secondsElapsed % 60;
+            const finalTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            // Save completion time
+            setCompletionTime(finalTime);
+            // Show success popup
+            setShowSuccessPopup(true);
+          } else {
+            // Show incorrect state with a period
+            newGrid[row][col].value = '.';
+            setShowErrorPopup(true);
+          }
+          // Toggle for next time
+          setLastLetterToggle(prev => !prev);
+        }
       }
     } else {
       // Fallback if correctValue is not set
@@ -626,6 +825,31 @@ const CrosswordGame = ({ mode, onModeChange, onBackToHome, puzzleId }) => {
     onBackToHome(); // Use the original flow when going back from the game
   };
 
+  // Add a function to generate leaderboard data based on user's time
+  const generateLeaderboard = (userTime) => {
+    // Convert user time from "MM:SS" format to seconds
+    const [userMinutes, userSeconds] = userTime.split(':').map(Number);
+    const userTotalSeconds = userMinutes * 60 + userSeconds;
+    
+    // Define fixed leaderboard entries
+    const fixedEntries = [
+      { name: 'CrypticMaster', time: '00:42', seconds: 42 },
+      { name: 'WordWizard', time: '01:15', seconds: 75 },
+      { name: 'PuzzlePro', time: '02:10', seconds: 130 },
+      { name: 'CrossMaster', time: '02:47', seconds: 167 },
+      { name: 'GridGuru', time: '03:21', seconds: 201 }
+    ];
+    
+    // Add user entry
+    const userEntry = { name: 'You', time: userTime, seconds: userTotalSeconds, isUser: true };
+    
+    // Combine all entries and sort by time (in seconds)
+    const allEntries = [...fixedEntries, userEntry].sort((a, b) => a.seconds - b.seconds);
+    
+    // Get top 5 entries
+    return allEntries.slice(0, 5);
+  };
+
   return (
     <GameContainer>
       <GameHeader 
@@ -690,6 +914,65 @@ const CrosswordGame = ({ mode, onModeChange, onBackToHome, puzzleId }) => {
           />
         </RightPanel>
       </GameContent>
+
+      {/* Add the popups */}
+      {showSuccessPopup && (
+        <PopupOverlay onClick={closePopups}>
+          <PopupContent onClick={e => e.stopPropagation()}>
+            <PopupEmoji>🎉</PopupEmoji>
+            <PopupTitle isSuccess={true}>Congratulations!</PopupTitle>
+            <PopupMessage>
+              You've successfully completed the crossword puzzle!
+            </PopupMessage>
+            
+            <CompletionTimeWrapper>
+              <CompletionTimeLabel>YOUR TIME</CompletionTimeLabel>
+              <CompletionTimeValue>{completionTime}</CompletionTimeValue>
+            </CompletionTimeWrapper>
+            
+            <LeaderboardContainer>
+              <LeaderboardTitle>Leaderboard</LeaderboardTitle>
+              <LeaderboardTable>
+                <thead>
+                  <tr>
+                    <LeaderboardHeader>#</LeaderboardHeader>
+                    <LeaderboardHeader>Player</LeaderboardHeader>
+                    <LeaderboardHeader>Time</LeaderboardHeader>
+                  </tr>
+                </thead>
+                <tbody>
+                  {generateLeaderboard(completionTime).map((entry, index) => (
+                    <LeaderboardRow key={index} isUser={entry.isUser}>
+                      <LeaderboardCell>{index + 1}</LeaderboardCell>
+                      <LeaderboardCell highlight={entry.isUser}>{entry.name}</LeaderboardCell>
+                      <LeaderboardCell highlight={entry.isUser}>{entry.time}</LeaderboardCell>
+                    </LeaderboardRow>
+                  ))}
+                </tbody>
+              </LeaderboardTable>
+            </LeaderboardContainer>
+            
+            <PopupButton isSuccess={true} onClick={closePopups}>
+              Continue
+            </PopupButton>
+          </PopupContent>
+        </PopupOverlay>
+      )}
+
+      {showErrorPopup && (
+        <PopupOverlay onClick={closePopups}>
+          <PopupContent onClick={e => e.stopPropagation()}>
+            <PopupEmoji>❌</PopupEmoji>
+            <PopupTitle isSuccess={false}>Not Quite Right</PopupTitle>
+            <PopupMessage>
+              One or more squares are incorrect. Keep trying!
+            </PopupMessage>
+            <PopupButton isSuccess={false} onClick={closePopups}>
+              Try Again
+            </PopupButton>
+          </PopupContent>
+        </PopupOverlay>
+      )}
     </GameContainer>
   );
 };
