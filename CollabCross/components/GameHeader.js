@@ -46,14 +46,14 @@ const StatItem = styled.div`
 
 const StatLabel = styled.div`
   font-size: 12px;
-  color: ${darkTheme.text.tertiary};
+  color: #ffffff;
 `;
 
 const StatValue = styled.div`
   font-size: 16px;
   font-weight: bold;
   background-color: ${darkTheme.background.elevated};
-  color: ${darkTheme.text.primary};
+  color: #ffffff;
   padding: 5px 10px;
   border-radius: 4px;
   min-width: 60px;
@@ -79,7 +79,7 @@ const TimerValue = styled(StatValue)`
 `;
 
 const PuzzleRating = styled(StatValue)`
-  background-color: ${props => props.rating >= 1000 ? '#5cb85c' : '#f0ad4e'};
+  background-color: #ff6b6b; /* Light red background color */
   color: white;
 `;
 
@@ -97,14 +97,14 @@ const ProfileIcon = styled.div`
 const BackButton = styled.button`
   background: none;
   border: none;
-  color: ${darkTheme.text.secondary};
+  color: #ffffff;
   cursor: pointer;
   display: flex;
   align-items: center;
   font-size: 14px;
   
   &:hover {
-    color: ${darkTheme.text.primary};
+    color: ${darkTheme.brand.primary};
   }
 `;
 

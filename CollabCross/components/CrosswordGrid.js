@@ -6,15 +6,20 @@ const GridContainer = styled.div`
   display: flex;
   justify-content: center;
   margin-bottom: 15px;
+  transform: scale(1.2); /* Moderate size increase */
+  transform-origin: center center;
+  margin: 10px 0 60px 0; /* Reduced top margin to move grid upward */
 `;
 
 const Grid = styled.div`
   display: grid;
-  grid-template-columns: repeat(${props => props.size}, 30px);
-  grid-template-rows: repeat(${props => props.size}, 30px);
+  grid-template-columns: repeat(${props => props.size}, 35px);
+  grid-template-rows: repeat(${props => props.size}, 35px);
   gap: 1px;
   border: 2px solid #444;
   background-color: #444;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2); /* Add shadow for depth */
+  padding: 2px; /* Add slight padding around grid */
 `;
 
 const Cell = styled.div`
@@ -25,7 +30,7 @@ const Cell = styled.div`
   justify-content: center;
   background-color: ${props => props.isBlack ? darkTheme.background.primary : darkTheme.background.elevated};
   color: ${props => props.isBlack ? darkTheme.text.primary : darkTheme.text.primary};
-  font-size: 16px;
+  font-size: 18px; /* Reduced from 20px to 18px */
   font-weight: bold;
   position: relative;
   user-select: none;
@@ -48,9 +53,9 @@ const Cell = styled.div`
 
 const CellNumber = styled.div`
   position: absolute;
-  top: 1px;
-  left: 1px;
-  font-size: 10px;
+  top: 2px;
+  left: 2px;
+  font-size: 12px; /* Increased from 10px to 12px */
   font-weight: normal;
   color: ${darkTheme.text.tertiary};
 `;
@@ -65,7 +70,7 @@ const CellNumber = styled.div`
 //   '10-5': 31
 // };
 
-const CrosswordGrid = ({ grid, onCellClick }) => {
+const CrosswordGrid = ({ grid, onCellClick, focusedClue }) => {
   const [selectedCell, setSelectedCell] = useState(null);
   const [direction, setDirection] = useState('across'); // 'across' or 'down'
 
@@ -122,6 +127,7 @@ const CrosswordGrid = ({ grid, onCellClick }) => {
     return false;
   };
 
+  // Ensure grid rendering reflects the exact black square pattern and numbering
   return (
     <GridContainer>
       <Grid size={grid.length}>

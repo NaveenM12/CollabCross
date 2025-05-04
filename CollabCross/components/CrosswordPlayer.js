@@ -2,7 +2,15 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { darkTheme } from '../styles/theme';
 
-// ... (include all the necessary styled components) ...
+const PlayContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  min-height: 100vh;
+  background-color: ${darkTheme.background.primary};
+  color: ${darkTheme.text.primary};
+`;
 
 const CrosswordPlayer = ({ puzzleData }) => {
   const [playGrid, setPlayGrid] = useState([]);

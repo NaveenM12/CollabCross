@@ -13,7 +13,7 @@ const ChatHeader = styled.div`
   padding: 10px;
   background-color: ${darkTheme.background.elevated};
   border-bottom: 1px solid ${darkTheme.border.primary};
-  color: ${darkTheme.text.primary};
+  color: #ffffff;
 `;
 
 const MessagesContainer = styled.div`
@@ -29,7 +29,7 @@ const MessagesContainer = styled.div`
 
 const MessageBubble = styled.div`
   background-color: ${props => props.sender === 'You' ? darkTheme.brand.primary : darkTheme.background.elevated};
-  color: ${darkTheme.text.primary};
+  color: #ffffff;
   padding: 8px 12px;
   border-radius: 12px;
   margin: 4px 0;
@@ -39,7 +39,7 @@ const MessageBubble = styled.div`
 
 const SenderName = styled.div`
   font-size: 12px;
-  color: #aaa;
+  color: #ffffff;
   margin-bottom: 2px;
   ${props => props.sender === 'You' && 'text-align: right;'}
 `;
@@ -56,10 +56,10 @@ const ChatInput = styled.input`
   border: none;
   border-radius: 20px;
   background-color: ${darkTheme.background.elevated};
-  color: ${darkTheme.text.primary};
+  color: #ffffff;
   
   &::placeholder {
-    color: ${darkTheme.text.tertiary};
+    color: #ffffff;
   }
 `;
 

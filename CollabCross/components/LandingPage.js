@@ -43,7 +43,7 @@ const TitleText = styled.h1`
   margin-bottom: 40px;
   text-align: center;
   font-weight: normal;
-  color: ${darkTheme.text.secondary};
+  color: #ffffff;
 `;
 
 const ContentWrapper = styled.div`
@@ -85,7 +85,7 @@ const PuzzleTitle = styled.div`
   justify-content: center;
   gap: 10px;
   margin-bottom: 30px;
-  color: ${darkTheme.brand.primary};
+  color: #ffffff;
   position: relative;
   
   &:after {
@@ -171,7 +171,7 @@ const ModeTitle = styled.div`
 
 const ModeDescription = styled.div`
   font-size: 14px;
-  color: ${darkTheme.text.secondary};
+  color: #ffffff;
   margin-top: 4px;
 `;
 
@@ -251,7 +251,7 @@ const OrDivider = styled.div`
   font-size: 18px;
   font-weight: bold;
   margin: 15px 0;
-  color: ${darkTheme.text.tertiary};
+  color: #ffffff;
   position: relative;
   
   &:before, &:after {
@@ -298,7 +298,7 @@ const RandomPartnerButton = styled.button`
   gap: 12px;
   font-size: 18px;
   cursor: pointer;
-  color: ${darkTheme.brand.primary};
+  color: #ffffff;
   font-weight: bold;
   transition: all 0.2s ease;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -326,7 +326,7 @@ const FriendsHeader = styled.div`
 const FriendsTitle = styled.h3`
   font-size: 20px;
   margin: 0;
-  color: ${darkTheme.brand.primary};
+  color: #ffffff;
 `;
 
 const AddFriendButton = styled.button`
@@ -337,7 +337,7 @@ const AddFriendButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: ${darkTheme.text.secondary};
+  color: #ffffff;
   transition: color 0.2s, transform 0.2s;
   
   &:hover {

@@ -45,7 +45,7 @@ const PlayerIcon = styled.div`
 
 const PlayerName = styled.div`
   font-weight: bold;
-  color: white;
+  color: #ffffff;
   font-size: 20px;
 `;
 
@@ -55,7 +55,7 @@ const StatsRow = styled.div`
   gap: 8px;
   margin-bottom: 15px;
   font-size: 16px;
-  color: #ccc;
+  color: #ffffff;
 `;
 
 const StatItem = styled.div`
@@ -65,12 +65,12 @@ const StatItem = styled.div`
 `;
 
 const StatLabel = styled.span`
-  color: #aaa;
+  color: #ffffff;
 `;
 
 const StatValue = styled.span`
   font-weight: bold;
-  color: white;
+  color: #ffffff;
 `;
 
 const SquareProgressBar = styled.div`
@@ -94,7 +94,7 @@ const SquareProgress = styled.div`
 
 const ProgressLabel = styled.div`
   font-size: 16px;
-  color: #ddd;
+  color: #ffffff;
   text-align: right;
   margin-bottom: 5px;
   font-weight: bold;
@@ -123,15 +123,10 @@ const PlayerStats = ({ players, currentPlayer }) => {
                   <StatValue>{player.squaresFilled}</StatValue>
                 </StatItem>
                 <StatItem>
-                  <StatLabel>Words Solved:</StatLabel>
-                  <StatValue>{player.wordsSolved}</StatValue>
+                  <StatLabel>Completion:</StatLabel>
+                  <StatValue>{filledPercentage}%</StatValue>
                 </StatItem>
               </StatsRow>
-              
-              <ProgressLabel>Completion: {filledPercentage}%</ProgressLabel>
-              <SquareProgressBar>
-                <SquareProgress percentage={filledPercentage} />
-              </SquareProgressBar>
             </PlayerCard>
           );
         })}

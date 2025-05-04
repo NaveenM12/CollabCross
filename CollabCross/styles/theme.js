@@ -2,16 +2,16 @@ export const darkTheme = {
   // Background colors
   background: {
     primary: '#1a1a1a',
-    secondary: '#222222',
-    tertiary: '#2a2a2a',
+    secondary: '#2d2d2d',
+    tertiary: '#3d3d3d',
     elevated: '#333333',
   },
   
   // Text colors
   text: {
     primary: '#ffffff',
-    secondary: '#cccccc',
-    tertiary: '#999999',
+    secondary: '#ffffff',
+    tertiary: '#ffffff',
     accent: '#1a56ff',
   },
   
@@ -23,8 +23,8 @@ export const darkTheme = {
   
   // Brand colors
   brand: {
-    primary: '#1a56ff',
-    secondary: '#0043e8',
+    primary: '#3366cc',
+    secondary: '#4d79d9',
   },
   
   // Status colors
